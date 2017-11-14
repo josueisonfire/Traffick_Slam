@@ -29,18 +29,19 @@ var menuState =
     displayMainMenu: function()
     {
         //load image
+        var font_size = 50;
         menu_background_sprite = game.add.sprite(0,0,'menu_background');
-        newgame_button = game.add.sprite(600,50,'menu_button');
-        controls_button = game.add.sprite(600,225,'menu_button');
-        help_button = game.add.sprite(600,400,'menu_button');
-        menu_car = game.add.sprite(85,200,'menu_car');
-        car.scale.setTo(0.7,0.7);
+        newgame_button = game.add.sprite(380,50,'menu_button');
+        controls_button = game.add.sprite(380,225,'menu_button');
+        help_button = game.add.sprite(380,400,'menu_button');
+        menu_car = game.add.sprite(45,200,'menu_car');
+        menu_car.scale.setTo(0.5,0.5);
     
-        text_newgame = this.addtext(875,125,'NEW GAME', 50);
-        text_controls = this.addtext(875,300,'CONTROLS', 50);
-        text_help = this.addtext(875,475,'HELP', 50);
-        text_title1 = this.addtext(309,150,'TRAFFIC', 50);
-        text_title2 = this.addtext(309,474,' JAM    SLAM!', 50);
+        text_newgame = this.addtext(565,125,'NEW GAME', font_size);
+        text_controls = this.addtext(565,300,'CONTROLS', font_size);
+        text_help = this.addtext(565,475,'HELP', font_size);
+        text_title1 = this.addtext(190,150,'TRAFFIC', font_size);
+        text_title2 = this.addtext(190,425,' JAM SLAM!', font_size);
     },
 
     addtext: function(x, y, str, size)
