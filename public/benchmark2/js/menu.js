@@ -1,0 +1,71 @@
+
+// declare global variables
+/*MAIN MENU*/
+var menuState = 
+{
+    create: function()
+    {
+        // declare nested local variables.
+        var menu_background_sprite;
+        var newgame_button;
+        var controls_button;
+        var help_button;
+        var menu_car;
+        var text_controls;
+        var text_help;
+        var text_newgame;
+        var text_title1;
+        var text_title2;
+        this.displayMainMenu();
+    },
+
+    displayMainMenu: function()
+    {
+        //load image
+        menu_background_sprite = game.add.sprite(0,0,'menu_background');
+        newgame_button = game.add.sprite(600,50,'menu_button');
+        controls_button = game.add.sprite(600,225,'menu_button');
+        help_button = game.add.sprite(600,400,'menu_button');
+        menu_car = game.add.sprite(85,200,'menu_car');
+        car.scale.setTo(0.7,0.7);
+    
+        text_newgame = this.addtext(875,125,'NEW GAME', 50);
+        text_controls = this.addtext(875,300,'CONTROLS', 50);
+        text_help = this.addtext(875,475,'HELP', 50);
+        text_title1 = this.addtext(309,150,'TRAFFIC', 50);
+        text_title2 = this.addtext(309,474,' JAM    SLAM!', 50);
+    },
+
+    addtext: function(x, y, str, size)
+    {
+        var text = game.add.text(x,y,str);
+        text.anchor.set(0.5);
+        text.font = 'Arial Black';
+        text.fontSize = size;
+        text.fontWeight = 'bold';
+        text.fill = '#ffffff';
+        text.setShadow(0, 0, 'rgba(0, 0, 0, 0.5)', 0);
+        return text;
+    },
+
+    start: function()
+    {
+        game.state.start('play');
+    }
+};
+
+
+
+function killMenu()
+{
+    newgame_button.destroy();
+    controls_button.destroy();
+    help_button.destroy();
+    menu_car.destroy();
+    text_controls.destroy();
+    text_help.destroy();
+    text_newgame.destroy();
+    text_title1.destroy();
+    text_title2.destroy();
+    menu_background_sprite.destroy();
+}
