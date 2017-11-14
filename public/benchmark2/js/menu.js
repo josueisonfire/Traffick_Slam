@@ -3,6 +3,13 @@
 /*MAIN MENU*/
 var menuState = 
 {
+    //load all assets
+    preload: function(){        
+        game.load.image('menu_background', 'assets/menu_background.png');
+        game.load.image('menu_button','assets/menu_button.png');
+        game.load.image('menu_car','assets/menu_car.png');
+    },
+    
     create: function()
     {
         // declare nested local variables.

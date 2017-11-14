@@ -1,3 +1,4 @@
+/*UNUSED*/
 var loadState = {
     preload: function(){
         //TODO:: add a loading... label
