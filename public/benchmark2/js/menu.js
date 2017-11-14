@@ -31,7 +31,12 @@ var menuState =
         //load image
         var font_size = 50;
         menu_background_sprite = game.add.sprite(0,0,'menu_background');
+        
+        // Added button to start game, with event listener.
         newgame_button = game.add.sprite(380,50,'menu_button');
+        newgame_button.inputEnabled = true;
+        newgame_button.events.onInputDown.add(this.startGame, this);
+
         controls_button = game.add.sprite(380,225,'menu_button');
         help_button = game.add.sprite(380,400,'menu_button');
         menu_car = game.add.sprite(45,200,'menu_car');
@@ -59,7 +64,13 @@ var menuState =
     start: function()
     {
         game.state.start('play');
-    }
+    },
+
+    //event listener.
+    startGame: function()
+    {
+        this.start();
+    },
 };
 
 
