@@ -1,15 +1,15 @@
 
 // declare global variables
 /*MAIN MENU*/
-var menuState = 
+var menuState =
 {
     //load all assets
-    preload: function(){        
+    preload: function(){
         game.load.image('menu_background', 'assets/menu_background.png');
         game.load.image('menu_button','assets/menu_button.png');
         game.load.image('menu_car','assets/menu_car.png');
     },
-    
+
     create: function()
     {
         // declare nested local variables.
@@ -31,17 +31,25 @@ var menuState =
         //load image
         var font_size = 50;
         menu_background_sprite = game.add.sprite(0,0,'menu_background');
-        
+
         // Added button to start game, with event listener.
         newgame_button = game.add.sprite(380,50,'menu_button');
         newgame_button.inputEnabled = true;
         newgame_button.events.onInputDown.add(this.startGame, this);
 
+        // Added button to start control screen, with event listener.
         controls_button = game.add.sprite(380,225,'menu_button');
+        controls_button.inputEnabled = true;
+        controls_button.events.onInputDown.add(this.showcontrols, this);
+
+        //Added button to start help screen, with event listener.
         help_button = game.add.sprite(380,400,'menu_button');
+        help_button.inputEnabled = true;
+        help_button.events.onInputDown.add(this.showhelp, this);
+
         menu_car = game.add.sprite(45,200,'menu_car');
         menu_car.scale.setTo(0.5,0.5);
-    
+
         text_newgame = this.addtext(565,125,'NEW GAME', font_size);
         text_controls = this.addtext(565,300,'CONTROLS', font_size);
         text_help = this.addtext(565,475,'HELP', font_size);
@@ -71,20 +79,14 @@ var menuState =
     {
         this.start();
     },
+
+    showcontrols: function()
+    {
+        game.state.start('controls');
+    },
+
+    showhelp: function()
+    {
+        game.state.start('help');
+    }
 };
-
-
-
-function killMenu()
-{
-    newgame_button.destroy();
-    controls_button.destroy();
-    help_button.destroy();
-    menu_car.destroy();
-    text_controls.destroy();
-    text_help.destroy();
-    text_newgame.destroy();
-    text_title1.destroy();
-    text_title2.destroy();
-    menu_background_sprite.destroy();
-}
