@@ -1,4 +1,5 @@
-var bootState = {
+var bootState =
+{
     create: function(){
         //start physics engine
         game.physics.startSystem(Phaser.Physics.ARCADE);
