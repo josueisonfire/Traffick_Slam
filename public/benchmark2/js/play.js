@@ -25,21 +25,24 @@ var playState = {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.runKey = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.crouchKey = this.input.keyboard.assKey(Phaser.Keyboard.E);        
+        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);        
                 
     },
     
     update: function(){
         this.playerMovement();
-        
+        this.playerJump();
         //infinite loop of background images
         this.updateBackground();       
         
         //debug stuff TODO:: erase
         game.debug.text("bgCounter: " + this.backgroundCounter, 32, 32);
         game.debug.text("Y:       " + this.player.y, 32, 64);
-        game.debug.text("yOrig:   " + this.player.yOrig, 32, 120);
-        game.debug.text("this.game.height: "+this.game.height, 32, 140);
+        game.debug.text("player.jumped:    "+this.player.jumped, 32, 120);
+        game.debug.text("player.goingUp:   "+this.player.goingUp, 32, 140);
+        game.debug.text("player.goingDown: "+this.player.goingDown, 32, 160);
+        game.debug.text("player velocityX: "+this.player.body.velocity.x, 32, 180);
+        game.debug.text("player velocityY: "+this.player.body.velocity.y, 32, 200);
         
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
@@ -59,6 +62,8 @@ var playState = {
         this.player.maxSpeed = 300;
         this.player.isDead = false;
         this.player.jumped = false;
+        this.player.goingUp = false;
+        this.player.goingDown = false;
         
         //variables to track where the player started and track change in y distance
         this.player.yOrig = this.player.y;
@@ -136,8 +141,37 @@ var playState = {
     },
     
     playerJump: function(){
+    //TODO:: drifiting bug after jumping; has to do with changing scale probably    
+        if(this.player.jumped){
+        //change sprite size for going up
+            if(this.player.goingUp){
+                this.player.scale.x *= 1.01;
+                this.player.scale.y *= 1.01;
+            }
+        //change sprite size for going down
+            if (this.player.goingDown){
+                this.player.scale.x /= 1.01;
+                this.player.scale.y /= 1.01;
+            }
+        }else{
+            this.player.scale.setTo(1,1);
+        }
+        
         if (this.jumpKey.isDown && !this.player.jumped){
-            
+            this.player.jumped = true;
+            this.player.goingUp = true;
+            //going up
+            this.time.events.add(1000, function(){
+                this.player.goingUp = false;
+                this.player.goingDown = true;
+                //going down
+                this.time.events.add(1000, function(){
+                    this.player.goingDown = false;
+                    this.player.jumped = false;
+                    //reset scale to original
+                    this.player.scale.x = 1;
+                    this.player.scale.y = 1;
+                }, this);}, this);
         }
     },
     
