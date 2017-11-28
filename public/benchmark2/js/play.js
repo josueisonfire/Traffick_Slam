@@ -9,6 +9,8 @@ var playState = {
     create: function(){
         this.backgroundCounter = 0;
         
+        this.physics.startSystem(Phaser.Physics.ARCADE);
+        
         //create background images to repeat
         this.createBackground();
         
@@ -64,8 +66,9 @@ var playState = {
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.world.centerX, this.world.height -300, 'player');
-        //boolean variables
+        //this.player.anchor.setTo(0.5,0.5);
         this.player.scale.setTo(2,2);
+        //boolean variables
         this.player.isDead = false;
         this.player.jumped = false;
         this.player.goingUp = false;
@@ -76,6 +79,7 @@ var playState = {
         this.player.maxSpeed = 300;
         this.player.accel = 20;
         this.player.friction = 0.9;
+        this.player.jumpScale = 0.01;
         
         //variables to track where the player started and track change in y distance
         this.player.yOrig = this.player.y;
@@ -108,7 +112,7 @@ var playState = {
         this.backgrounds = this.add.group();
         this.backgrounds.createMultiple(3, 'background');
         for (var i=0; i<3; i++){
-            this.createBackgroundOne(-600*i);
+            this.createBackgroundOne(-625*i);
         }
     },
     
@@ -121,7 +125,8 @@ var playState = {
     },
     
     createCars: function(){
-        this.cars = this.add.group();        
+        this.cars = this.add.group();
+        this.cars.enableBody = true;
         var car1 = this.add.sprite(408,400, 'car1');
         car1.scale.setTo(2.5,2.5);
         game.physics.arcade.enable(car1);
@@ -134,7 +139,7 @@ var playState = {
         this.backgrounds.forEachAlive( function(bg){
             if(bg.y > this.camera.y + this.game.height){
                 bg.kill();
-                this.createBackgroundOne(-600*this.backgroundCounter);
+                this.createBackgroundOne(-625*this.backgroundCounter);
             }
         }, this);
     },
@@ -173,43 +178,43 @@ var playState = {
     },
     
     playerJump: function(){
-    //TODO:: drifiting bug after jumping; has to do with changing scale probably    
+    //TODO:: drifting bug after jumping; has to do with changing scale probably    
         if(this.player.jumped){
             //change spd values for air controls
             this.player.accel = 8;
             this.player.friction = 0.9999;
         //change sprite size for going up
             if(this.player.goingUp){
-                this.player.scale.x *= 1.01;
-                this.player.scale.y *= 1.01;
+                this.player.scale.x += this.player.jumpScale;
+                this.player.scale.y += this.player.jumpScale;
             }
         //change sprite size for going down
             if (this.player.goingDown){
-                this.player.scale.x /= 1.01;
-                this.player.scale.y /= 1.01;
-            }
+                this.player.scale.x -= this.player.jumpScale;
+                this.player.scale.y -= this.player.jumpScale;
+            }   
         }else{
             //reset scale and speed values to original
-            this.player.scale.setTo(2,2);
             this.player.accel = 20;
             this.player.friction = 0.9;
         }
         
         //when jump happens
+        if(this.crouchKey.isDown){
+                this.player.scale.x += this.player.jumpScale;
+                this.player.scale.y += this.player.jumpScale;
+        }
         if (this.jumpKey.isDown && !this.player.jumped){
-            this.player.jumped = true;
+            this.player.jumped = true;            
             this.player.goingUp = true;
             //going up
-            this.time.events.add(1000, function(){
+            this.time.events.add(800, function(){
                 this.player.goingUp = false;
                 this.player.goingDown = true;
                 //going down
-                this.time.events.add(1000, function(){
+                this.time.events.add(800, function(){
                     this.player.goingDown = false;
                     this.player.jumped = false;
-                    //reset scale to original
-                    this.player.scale.x = 1;
-                    this.player.scale.y = 1;
                 }, this);}, this);
         }
     },
