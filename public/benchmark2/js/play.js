@@ -1,7 +1,7 @@
 var playState = {
     preload: function(){
         //load all assets
-        this.load.image('background', 'assets/background.png');
+        this.load.image('background', 'assets/background1.png');
         this.load.spritesheet('player', 'assets/player.png', 17, 17);
         this.load.spritesheet('car1', 'assets/bus1.png', 30, 50);
     },
@@ -12,12 +12,8 @@ var playState = {
         //create background images to repeat
         this.createBackground();
         
-        //create cars        
-        var car1 = this.add.sprite(408,400, 'car1');
-        car1.scale.setTo(2.5,2.5);
-        game.physics.arcade.enable(car1);
-        car1.body.velocity.y = -250;
-        
+        //create cars   
+        this.createCars();
         //create player character
         this.createPlayer();
         
@@ -68,12 +64,14 @@ var playState = {
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.world.centerX, this.world.height -300, 'player');
+        //boolean variables
         this.player.scale.setTo(2,2);
         this.player.isDead = false;
         this.player.jumped = false;
         this.player.goingUp = false;
         this.player.goingDown = false;
         this.player.isFacingUp = true;
+        this.player.isOnCar = false;
         //speed properties
         this.player.maxSpeed = 300;
         this.player.accel = 20;
@@ -123,8 +121,12 @@ var playState = {
     },
     
     createCars: function(){
-        this.cars = this.add.group();
-        //TODO:: implement
+        this.cars = this.add.group();        
+        var car1 = this.add.sprite(408,400, 'car1');
+        car1.scale.setTo(2.5,2.5);
+        game.physics.arcade.enable(car1);
+        car1.body.velocity.y = -250;
+        
     },
     
 //update-related functions    
@@ -164,7 +166,7 @@ var playState = {
             if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
                 this.player.body.velocity.x = 0;
         }
-        //TODO:: slow down diagonal movements --by a factor of 1/sqrt(2)?--
+        //TODO:: slow down diagonal movements --by a factor of 1/sqrt(2)? probably not--
         //if(2keyspressed for any 4 directions) player velocity / sqrt(2)
     //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
