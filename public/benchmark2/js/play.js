@@ -3,7 +3,16 @@ var playState = {
         //load all assets
         this.load.image('background', 'assets/background1.png');
         this.load.spritesheet('player', 'assets/player.png', 17, 17);
-        this.load.spritesheet('car1', 'assets/bus1.png', 30, 50);
+        this.load.spritesheet('bus', 'assets/cars/bus (30x50)/bus.png', 30, 50);
+        this.load.spritesheet('car1', 'assets/cars/cars (20x35)/BLACK CAR.png', 20, 35);
+        this.load.spritesheet('car2', 'assets/cars/cars (20x35)/BLUE CAR.png', 20, 35);
+        this.load.spritesheet('car3', 'assets/cars/cars (20x35)/COFFEE CAR.png', 20, 35);
+        this.load.spritesheet('car4', 'assets/cars/cars (20x35)/GREEN CAR.png', 20, 35);
+        this.load.spritesheet('car5', 'assets/cars/cars (20x35)/RED CAR.png', 20, 35);
+        this.load.spritesheet('car6', 'assets/cars/cars (20x35)/TAXI.png', 20, 35);
+        this.load.spritesheet('car7', 'assets/cars/cars (20x35)/UNICORN CAR.png', 20, 35);
+        this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);        
+        this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
     },
     
     create: function(){
@@ -15,7 +24,7 @@ var playState = {
         this.createBackground();
         
         //create cars   
-        this.createCars();
+        this.initializeCars();
         //create player character
         this.createPlayer();
         
@@ -28,6 +37,9 @@ var playState = {
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);        
                 
+        //lane x values
+        this.lanes = [60, 190, 320, 450, 570];
+        
     },
     
     update: function(){
@@ -40,14 +52,14 @@ var playState = {
         this.updateBackground();       
         
         //debug stuff TODO:: erase
-        game.debug.text("bgCounter: " + this.backgroundCounter, 32, 32);
-        game.debug.text("Y:       " + this.player.y, 32, 64);
-        game.debug.text("player.jumped:    "+this.player.jumped, 32, 120);
-        game.debug.text("player.goingUp:   "+this.player.goingUp, 32, 140);
-        game.debug.text("player.goingDown: "+this.player.goingDown, 32, 160);
-        game.debug.text("player velocityX: "+this.player.body.velocity.x, 32, 180);
-        game.debug.text("player velocityY: "+this.player.body.velocity.y, 32, 200);
-        game.debug.text("player isFacingUp: "+this.player.isFacingUp, 32, 220);
+        game.debug.text("X:                 " + this.player.x, 32, 32);
+        game.debug.text("Y:                 " + this.player.y, 32, 64);
+        game.debug.text("player.jumped:     "+this.player.jumped, 32, 120);
+        game.debug.text("player.goingUp:    "+this.player.goingUp, 32, 140);
+        game.debug.text("player.goingDown:  "+this.player.goingDown, 32, 160);
+        game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
+        game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
+        game.debug.text("cartimer:          "+this.carTimer, 32, 220);
         
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
@@ -61,6 +73,11 @@ var playState = {
                 this.player.maxSpeed = 300;
             }
         }
+        
+        //periodically create cars
+        this.createCars();
+        //if a car goes off screen + 600 then kill that car
+        this.cars.forEach(this.destroyCar);
     },
     
 //create-related functions
@@ -124,14 +141,14 @@ var playState = {
         return background;
     },
     
-    createCars: function(){
+    initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
-        var car1 = this.add.sprite(408,400, 'car1');
-        car1.scale.setTo(2.5,2.5);
-        game.physics.arcade.enable(car1);
-        car1.body.velocity.y = -250;
-        
+        this.cars.createMultiple(10, 'car1');
+        this.cars.forEach(function(car){
+            car.scale.setTo(2.5, 2.5);
+        })
+        this.carTimer = true;
     },
     
 //update-related functions    
@@ -282,6 +299,33 @@ var playState = {
     playerDead: function(){
         
     },
+    createCars: function(){
+        //TODO:: if number of cars on screen < a number then create a random car KEEP TERM
+        //generate a random # to determine the which lane to spawn car\
+        if (this.carTimer){
+            game.time.events.add(1000, function(){this.carTimer = true;}, this)
+            this.carTimer = false;
+            this.createOneCar(Math.floor(Math.random() * 4.99));
+        }
+        
+    },
+    createOneCar: function(lane){
+        var car = this.cars.getFirstDead();
+        if (lane != 0){
+            car.reset(this.lanes[lane], this.camera.y + 640);
+            car.body.velocity.y = -600/lane;
+        }
+        else{
+            car.reset(this.lanes[lane], this.camera.y - 140);
+            car.body.velocity.y = 500;
+        }
+        
+    },
+    destroyCar: function(car){
+        if(car.y > game.camera.y + 1200 || car.y < game.camera.y - 600){
+            car.kill();
+        }
+    }
 };
 
 
