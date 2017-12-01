@@ -45,8 +45,8 @@ var playState = {
     update: function(){
         if (!this.player.isDead){
             this.playerMovement();
-            this.playerJump();
             this.playerAnimate();
+            this.playerJump();
         }
         //infinite loop of background images
         this.updateBackground();       
@@ -78,6 +78,10 @@ var playState = {
         this.createCars();
         //if a car goes off screen + 600 then kill that car
         this.cars.forEach(this.destroyCar);
+        
+        //if player is not in the air, check for overlap with cars
+        if(!this.player.jumped)
+            this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
     },
     
 //create-related functions
@@ -123,6 +127,7 @@ var playState = {
         this.player.animations.add('jumpLeftDown', [0], 1, true);
         this.player.animations.add('jumpDown', [13], 1, true);
         this.player.animations.add('jumpRightDown', [4], 1, true);
+        this.player.animations.add('crouch', [19], 1, true);
     },
     
     createBackground: function(){
@@ -144,7 +149,7 @@ var playState = {
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
-        this.cars.createMultiple(10, 'car1');
+        this.cars.createMultiple(20, 'car1');
         this.cars.forEach(function(car){
             car.scale.setTo(2.5, 2.5);
         })
@@ -162,35 +167,39 @@ var playState = {
     },
     
     playerMovement: function(){
-        if(this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
-            this.player.body.velocity.y -= this.player.accel;
+        if(this.crouchKey.isDown && !this.player.jumped){
+            this.player.body.velocity.setTo(0,0);
+        }else{
+            if(this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
+                this.player.body.velocity.y -= this.player.accel;
+            }
+            else if (this.cursors.down.isDown && this.player.body.velocity.y < this.player.maxSpeed){
+                this.player.body.velocity.y += this.player.accel;
+            }
+            else{
+                //slowing down; friction-like effect
+                this.player.body.velocity.y *= this.player.friction;
+                //stop entirely when velocity is too small (while on ground)
+                if (this.player.body.velocity.y < this.player.accel && this.player.body.velocity.y > -this.player.accel && !this.player.jumped)
+                    this.player.body.velocity.y = 0;
+            }
+            if(this.cursors.left.isDown && this.player.body.velocity.x > -this.player.maxSpeed){
+                this.player.body.velocity.x -= this.player.accel;
+            }
+            else if(this.cursors.right.isDown && this.player.body.velocity.x < this.player.maxSpeed){
+                this.player.body.velocity.x += this.player.accel;
+            }
+            else{
+                //slowing down; friction-like effect
+                this.player.body.velocity.x *= this.player.friction;
+                //stop entirely when velocity is too small (while on ground)
+                if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
+                    this.player.body.velocity.x = 0;
+            }
         }
-        else if (this.cursors.down.isDown && this.player.body.velocity.y < this.player.maxSpeed){
-            this.player.body.velocity.y += this.player.accel;
-        }
-        else{
-            //slowing down; friction-like effect
-            this.player.body.velocity.y *= this.player.friction;
-            //stop entirely when velocity is too small (while on ground)
-            if (this.player.body.velocity.y < this.player.accel && this.player.body.velocity.y > -this.player.accel && !this.player.jumped)
-                this.player.body.velocity.y = 0;
-        }
-        if(this.cursors.left.isDown && this.player.body.velocity.x > -this.player.maxSpeed){
-            this.player.body.velocity.x -= this.player.accel;
-        }
-        else if(this.cursors.right.isDown && this.player.body.velocity.x < this.player.maxSpeed){
-            this.player.body.velocity.x += this.player.accel;
-        }
-        else{
-            //slowing down; friction-like effect
-            this.player.body.velocity.x *= this.player.friction;
-            //stop entirely when velocity is too small (while on ground)
-            if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
-                this.player.body.velocity.x = 0;
-        }
-        //TODO:: slow down diagonal movements --by a factor of 1/sqrt(2)? probably not--
-        //if(2keyspressed for any 4 directions) player velocity / sqrt(2)
-    //track the maximum distance player has traveled
+            //TODO:: slow down diagonal movements --by a factor of 1/sqrt(2)? probably not--
+            //if(2keyspressed for any 4 directions) player velocity / sqrt(2)
+        //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
     },
     
@@ -217,10 +226,6 @@ var playState = {
         }
         
         //when jump happens
-        if(this.crouchKey.isDown){
-                this.player.scale.x += this.player.jumpScale;
-                this.player.scale.y += this.player.jumpScale;
-        }
         if (this.jumpKey.isDown && !this.player.jumped){
             this.player.jumped = true;            
             this.player.goingUp = true;
@@ -255,7 +260,11 @@ var playState = {
                     this.player.animations.play('jumpDown');
                 }
             }
-        }else{
+        }
+        else if (this.crouchKey.isDown){
+            this.player.animations.play('crouch');
+        }    
+        else{
             if(this.cursors.up.isDown){
                 if(this.cursors.left.isDown){
                     this.player.animations.play('runningLeftUp');
@@ -305,6 +314,7 @@ var playState = {
         if (this.carTimer){
             game.time.events.add(1000, function(){this.carTimer = true;}, this)
             this.carTimer = false;
+            //TODO:: rng fix
             this.createOneCar(Math.floor(Math.random() * 4.99));
         }
         
@@ -325,6 +335,22 @@ var playState = {
         if(car.y > game.camera.y + 1200 || car.y < game.camera.y - 600){
             car.kill();
         }
+    },
+    
+    carOverlap: function(player, car){
+        //if player is inside the zone (110% of the car sprite + more room down)
+        if(player.x > car.x - car.width * 0.1 && player.x + player.width < car.x + car.width *1.1 && player.y > car.y - car.height * 0.1 && player.y + player.height < car.y + car.height *1.5)
+            player.isOnCar = true;
+        else{
+            player.isOnCar = false;
+            player.animations.play('dying');
+        }
+        
+        if(player.isOnCar && this.crouchKey.isDown){
+            player.body.velocity.x = car.body.velocity.x;
+            player.body.velocity.y = car.body.velocity.y;
+        }
+        
     }
 };
 
