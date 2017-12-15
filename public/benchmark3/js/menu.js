@@ -8,11 +8,16 @@ var menuState =
         game.load.image('menu_background', 'assets/menu_background.png');
         game.load.image('menu_button','assets/menu_button.png');
         game.load.image('menu_car','assets/menu_car.png');
+        game.load.audio('slide', 'assets/slide.mp3');
+        game.load.audio('click', 'assets/click.mp3')
+        game.load.audio('music', 'assets/main_st.mp3')
+
     },
 
     create: function()
     {
         // declare nested local variables.
+        var playing = 0;
         var menu_background_sprite;
         var newgame_button;
         var controls_button;
@@ -24,7 +29,12 @@ var menuState =
         var text_title1;
         var text_title2;
         this.displayMainMenu();
+        music = game.add.audio('music');
+        slide = game.add.audio('slide');
+        click = game.add.audio('click');
+        music.play();
     },
+
 
     displayMainMenu: function()
     {
@@ -55,7 +65,10 @@ var menuState =
         text_help = this.addtext(565,475,'HELP', font_size);
         text_title1 = this.addtext(190,150,'TRAFFIC', font_size);
         text_title2 = this.addtext(190,425,' JAM SLAM!', font_size);
+
     },
+
+
 
     addtext: function(x, y, str, size)
     {
@@ -71,22 +84,58 @@ var menuState =
 
     start: function()
     {
+        music.stop()
         game.state.start('play');
+
     },
 
     //event listener.
     startGame: function()
     {
+        music.stop()
+        click.play()
         this.start();
     },
 
     showcontrols: function()
     {
+        music.stop()
+        click.play()
         game.state.start('controls');
     },
 
     showhelp: function()
     {
+        music.stop()
+        click.play()
         game.state.start('help');
-    }
+    },
+
+    playslide: function()
+    {
+
+    },
+
+    // update: function()
+    // {
+    //     if(newgame_button.input.pointerOver())
+    //     {
+    //       if(playing == 0)
+    //       {
+    //         playing = 1;
+    //         slide.play();
+    //       }
+    //       else
+    //       {
+    //         //do nothing.
+    //       }
+    //     }
+    //     else
+    //     {
+    //         playing = 0;
+    //     }
+    //     if(controls_button.input.pointerOver())
+    //     if(help_button.input.pointerOver())
+    //
+    // }
 };
