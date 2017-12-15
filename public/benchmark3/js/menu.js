@@ -10,8 +10,7 @@ var menuState =
         game.load.image('menu_car','assets/menu_car.png');
         game.load.audio('slide', 'assets/slide.mp3');
         game.load.audio('click', 'assets/click.mp3')
-        game.load.audio('music', 'assets/main_st.mp3')
-
+        game.load.audio('music', 'assets/main_st.mp3');
     },
 
     create: function()
@@ -32,6 +31,7 @@ var menuState =
         music = game.add.audio('music');
         slide = game.add.audio('slide');
         click = game.add.audio('click');
+        music.stop();
         music.play();
     },
 

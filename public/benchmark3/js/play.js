@@ -11,37 +11,51 @@ var playState = {
         this.load.spritesheet('car5', 'assets/cars/cars (20x35)/RED CAR.png', 20, 35);
         this.load.spritesheet('car6', 'assets/cars/cars (20x35)/TAXI.png', 20, 35);
         this.load.spritesheet('car7', 'assets/cars/cars (20x35)/UNICORN CAR.png', 20, 35);
-        this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);        
+        this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
         this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
+        //load all sounds
+        game.load.audio('slide', 'assets/slide.mp3');
+        game.load.audio('click', 'assets/click.mp3')
+        game.load.audio('music', 'assets/main_st.mp3');
+        game.load.audio('street', 'assets/streetsounds.mp3');
+        game.load.audio('smallcarhorn', 'assets/smallcarhorn.mp3');
+        game.load.audio('carnhorn', 'assets/carhorn.mp3');
+        game.load.audio('pickuphorn', 'assets/truckhorn.mp3');
+        game.load.audio('bushorn', 'assets/bushorn.mp3');
     },
-    
+    // function o manage all the sounds.
+    playSound: function(soundtype, loop, timeout)
+    {
+
+    },
+
     create: function(){
         this.backgroundCounter = 0;
-        
+
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        
+
         //create background images to repeat
         this.createBackground();
-        
-        //create cars   
+
+        //create cars
         this.initializeCars();
         //create player character
         this.createPlayer();
-        
+
         //player animations
         this.createPlayerAnimations();
-        
+
         //cursor controls
         this.cursors = this.input.keyboard.createCursorKeys();
         this.runKey = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);        
-                
+        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);
+
         //lane x values
         this.lanes = [60, 190, 320, 450, 570];
-        
+
     },
-    
+
     update: function(){
         if (!this.player.isDead){
             this.playerMovement();
@@ -49,8 +63,8 @@ var playState = {
             this.playerJump();
         }
         //infinite loop of background images
-        this.updateBackground();       
-        
+        this.updateBackground();
+
         //debug stuff TODO:: erase
         game.debug.text("X:                 " + this.player.x, 32, 32);
         game.debug.text("Y:                 " + this.player.y, 32, 64);
@@ -60,10 +74,10 @@ var playState = {
         game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
         game.debug.text("cartimer:          "+this.carTimer, 32, 220);
-        
+
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
-        
+
         //player sprint
         if(!this.player.jumped){
             if (this.runKey.isDown){
@@ -73,17 +87,17 @@ var playState = {
                 this.player.maxSpeed = 300;
             }
         }
-        
+
         //periodically create cars
         this.createCars();
         //if a car goes off screen + 600 then kill that car
         this.cars.forEach(this.destroyCar);
-        
+
         //if player is not in the air, check for overlap with cars
         if(!this.player.jumped)
             this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
     },
-    
+
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.world.centerX, this.world.height -300, 'player');
@@ -101,21 +115,21 @@ var playState = {
         this.player.accel = 20;
         this.player.friction = 0.9;
         this.player.jumpScale = 0.01;
-        
+
         //variables to track where the player started and track change in y distance
         this.player.yOrig = this.player.y;
         this.player.yChange = 0;
-        
+
         //player physics
         game.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true;
     },
-    
+
     createPlayerAnimations: function(){
         this.player.animations.add('runningLeftDown', game.math.numberArray(0,3), 5, true);
         this.player.animations.add('runningRightDown', game.math.numberArray(4,7), 5, true);
         this.player.animations.add('runningUp', game.math.numberArray(8,11), 5, true);
-        this.player.animations.add('runningDown', game.math.numberArray(12,15), 5, true); 
+        this.player.animations.add('runningDown', game.math.numberArray(12,15), 5, true);
         this.player.animations.add('dying', game.math.numberArray(16,22), 5, false);
         this.player.animations.add('runningLeftUp', game.math.numberArray(23,26), 5, true);
         this.player.animations.add('runningRightUp', game.math.numberArray(27,30), 5, true);
@@ -129,7 +143,7 @@ var playState = {
         this.player.animations.add('jumpRightDown', [4], 1, true);
         this.player.animations.add('crouch', [19], 1, true);
     },
-    
+
     createBackground: function(){
         this.backgrounds = this.add.group();
         this.backgrounds.createMultiple(3, 'background');
@@ -137,7 +151,7 @@ var playState = {
             this.createBackgroundOne(-625*i);
         }
     },
-    
+
     //helper function
     createBackgroundOne: function(y){
         var background = this.backgrounds.getFirstDead();
@@ -145,7 +159,7 @@ var playState = {
         this.backgroundCounter++;
         return background;
     },
-    
+
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
@@ -155,8 +169,8 @@ var playState = {
         })
         this.carTimer = true;
     },
-    
-//update-related functions    
+
+//update-related functions
     updateBackground: function(){
         this.backgrounds.forEachAlive( function(bg){
             if(bg.y > this.camera.y + this.game.height){
@@ -165,7 +179,7 @@ var playState = {
             }
         }, this);
     },
-    
+
     playerMovement: function(){
         if(this.crouchKey.isDown && !this.player.jumped){
             this.player.body.velocity.setTo(0,0);
@@ -202,9 +216,9 @@ var playState = {
         //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
     },
-    
+
     playerJump: function(){
-    //TODO:: drifting bug after jumping; has to do with changing scale probably    
+    //TODO:: drifting bug after jumping; has to do with changing scale probably
         if(this.player.jumped){
             //change spd values for air controls
             this.player.accel = 8;
@@ -218,16 +232,16 @@ var playState = {
             if (this.player.goingDown){
                 this.player.scale.x -= this.player.jumpScale;
                 this.player.scale.y -= this.player.jumpScale;
-            }   
+            }
         }else{
             //reset scale and speed values to original
             this.player.accel = 20;
             this.player.friction = 0.9;
         }
-        
+
         //when jump happens
         if (this.jumpKey.isDown && !this.player.jumped){
-            this.player.jumped = true;            
+            this.player.jumped = true;
             this.player.goingUp = true;
             //going up
             this.time.events.add(800, function(){
@@ -240,7 +254,7 @@ var playState = {
                 }, this);}, this);
         }
     },
-    
+
     playerAnimate: function(){
         if(this.player.jumped){
             if(this.player.isFacingUp){
@@ -263,7 +277,7 @@ var playState = {
         }
         else if (this.crouchKey.isDown){
             this.player.animations.play('crouch');
-        }    
+        }
         else{
             if(this.cursors.up.isDown){
                 if(this.cursors.left.isDown){
@@ -304,10 +318,7 @@ var playState = {
             }
         }
     },
-    
-    playerDead: function(){
-        
-    },
+
     createCars: function(){
         //TODO:: if number of cars on screen < a number then create a random car KEEP TERM
         //generate a random # to determine the which lane to spawn car\
@@ -317,7 +328,7 @@ var playState = {
             //TODO:: rng fix
             this.createOneCar(Math.floor(Math.random() * 4.99));
         }
-        
+
     },
     createOneCar: function(lane){
         var car = this.cars.getFirstDead();
@@ -329,14 +340,14 @@ var playState = {
             car.reset(this.lanes[lane], this.camera.y - 140);
             car.body.velocity.y = 500;
         }
-        
+
     },
     destroyCar: function(car){
         if(car.y > game.camera.y + 1200 || car.y < game.camera.y - 600){
             car.kill();
         }
     },
-    
+
     carOverlap: function(player, car){
         //if player is inside the zone (110% of the car sprite + more room down)
         if(player.x > car.x - car.width * 0.1 && player.x + player.width < car.x + car.width *1.1 && player.y > car.y - car.height * 0.1 && player.y + player.height < car.y + car.height *1.5)
@@ -345,13 +356,11 @@ var playState = {
             player.isOnCar = false;
             player.animations.play('dying');
         }
-        
+
         if(player.isOnCar && this.crouchKey.isDown){
             player.body.velocity.x = car.body.velocity.x;
             player.body.velocity.y = car.body.velocity.y;
         }
-        
+
     }
 };
-
-

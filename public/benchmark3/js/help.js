@@ -5,6 +5,9 @@ var helpState =
         // lel ...
         game.load.image('menu_background', 'assets/menu_background.png');
         game.load.image('menu_button','assets/menu_button.png');
+        game.load.audio('slide', 'assets/slide.mp3');
+        game.load.audio('click', 'assets/click.mp3')
+        game.load.audio('music', 'assets/main_st.mp3');
     },
 
     create: function()
@@ -14,6 +17,9 @@ var helpState =
         var menu_background_sprite;
         var text;
         var insTie4;
+        music = game.add.audio('music');
+        slide = game.add.audio('slide');
+        click = game.add.audio('click');
         this.displayMainMenu();
     },
 
@@ -41,11 +47,13 @@ var helpState =
         menu_backButton.inputEnabled = true;
         menu_backButton.events.onInputDown.add(this.goBack, this);
         text = this.addtext(400,525,'BACK', 30);
-        insTie4 = this.addtext(400,250,'Help Jamie get in time for work amidst the unbearabel traffic! \nJump on cars and use them to travel forward! \n \n But Beware  of falling down and getting run over, \ngetting caught and shot bt the police, or stepping on a pointy \ntaxi sign, as they may kill you! \n \n Good Luck!',20);
+        insTie4 = this.addtext(400,250,'Help Jamie save her kidnapped wife amidst this traffic! \nJump on cars and use them to travel forward! \n \n But Beware  of falling down and getting run over, \ngetting caught and shot bt the police, or stepping on a pointy \ntaxi sign, as they may kill you! \n \n Good Luck!',20);
     },
 
     goBack: function()
     {
+      music.stop()
+      click.play()
       game.state.start('menu');
     }
 };

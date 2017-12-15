@@ -5,6 +5,9 @@ var controlsState =
       // lel ...
       game.load.image('menu_background', 'assets/menu_background.png');
       game.load.image('menu_button','assets/menu_button.png');
+      game.load.audio('slide', 'assets/slide.mp3');
+      game.load.audio('click', 'assets/click.mp3')
+      game.load.audio('music', 'assets/main_st.mp3');
   },
 
   create: function()
@@ -15,6 +18,9 @@ var controlsState =
 
       var insTie4;
       var text;
+      music = game.add.audio('music');
+      slide = game.add.audio('slide');
+      click = game.add.audio('click');
       this.displayMainMenu();
 
   },
@@ -51,6 +57,8 @@ var controlsState =
 
   goBack: function()
   {
+    music.stop()
+    click.play()
     game.state.start('menu');
   }
 };
