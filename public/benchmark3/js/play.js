@@ -50,7 +50,6 @@ var playState = {
         this.runKey = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);
-        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);
         this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I);
         //lane x values
         this.lanes = [60, 190, 320, 450, 570];
