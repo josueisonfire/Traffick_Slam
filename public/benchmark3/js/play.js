@@ -13,15 +13,15 @@ var playState = {
         this.load.spritesheet('car7', 'assets/cars/cars (20x35)/UNICORN CAR.png', 20, 35);
         this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
         this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
-        //load all sounds
+        /*//load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
         game.load.audio('click', 'assets/click.mp3')
         game.load.audio('music', 'assets/main_st.mp3');
-        game.load.audio('street', 'assets/streetsounds.mp3');
+        //game.load.audio('street', 'assets/streetsounds.mp3');
         game.load.audio('smallcarhorn', 'assets/smallcarhorn.mp3');
         game.load.audio('carnhorn', 'assets/carhorn.mp3');
         game.load.audio('pickuphorn', 'assets/truckhorn.mp3');
-        game.load.audio('bushorn', 'assets/bushorn.mp3');
+        game.load.audio('bushorn', 'assets/bushorn.mp3');*/
     },
     // function o manage all the sounds.
     playSound: function(soundtype, loop, timeout)
@@ -174,6 +174,7 @@ var playState = {
         this.cars = this.add.group();
         this.cars.enableBody = true;
         this.cars.createMultiple(20, 'car1');
+        //this.cars.createMultiple(3, ['car1','car2','car3','car4','car5','car6','car7']);
         this.cars.forEach(function(car){
             car.scale.setTo(2.8, 2.8);
         })
@@ -231,6 +232,8 @@ var playState = {
 
     playerJump: function(){
     //TODO:: drifting bug after jumping; has to do with changing scale probably
+        
+        //TODO:: make player sprite go under car when on ground but appear on top of car when jumping/ oncar
 
         if(this.player.jumped){
             //change spd values for air controls
