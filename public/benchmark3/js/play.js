@@ -67,6 +67,7 @@ var playState = {
         //player sprint
         if(!this.player.jumped){
             if (this.runKey.isDown){
+        
                 this.player.maxSpeed = 750;
             }
             else{
@@ -87,8 +88,8 @@ var playState = {
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.world.centerX, this.world.height -300, 'player');
-        //this.player.anchor.setTo(0.5,0.5);
         this.player.scale.setTo(2,2);
+        this.player.anchor.setTo(0.5,0.5);
         //boolean variables
         this.player.isDead = false;
         this.player.jumped = false;
@@ -204,7 +205,8 @@ var playState = {
     },
     
     playerJump: function(){
-    //TODO:: drifting bug after jumping; has to do with changing scale probably    
+    //TODO:: drifting bug after jumping; has to do with changing scale probably
+        
         if(this.player.jumped){
             //change spd values for air controls
             this.player.accel = 8;
@@ -306,7 +308,9 @@ var playState = {
     },
     
     playerDead: function(){
-        
+        this.player.isDead = true;
+        this.player.body.velocity.setTo(0,0);
+        this.player.animations.play('dying');
     },
     createCars: function(){
         //TODO:: if number of cars on screen < a number then create a random car KEEP TERM
@@ -343,7 +347,7 @@ var playState = {
             player.isOnCar = true;
         else{
             player.isOnCar = false;
-            player.animations.play('dying');
+            this.playerDead();
         }
         
         if(player.isOnCar && this.crouchKey.isDown){
