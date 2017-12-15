@@ -80,7 +80,6 @@ var playState = {
         game.debug.text("player.goingDown:  "+this.player.goingDown, 32, 160);
         game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
-        game.debug.text("cartimer:          "+this.carTimer, 32, 220);
         game.debug.text("invincible:        "+this.player.invincible, 32, 220);
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
@@ -124,7 +123,7 @@ var playState = {
         this.player.maxSpeed = 300;
         this.player.accel = 20;
         this.player.friction = 0.9;
-        this.player.jumpScale = 0.01;
+        this.player.jumpScale = 0.02;
 
         //variables to track where the player started and track change in y distance
         this.player.yOrig = this.player.y;
@@ -257,11 +256,11 @@ var playState = {
             this.player.jumped = true;
             this.player.goingUp = true;
             //going up
-            this.time.events.add(800, function(){
+            this.time.events.add(550, function(){
                 this.player.goingUp = false;
                 this.player.goingDown = true;
                 //going down
-                this.time.events.add(800, function(){
+                this.time.events.add(550, function(){
                     this.player.goingDown = false;
                     this.player.jumped = false;
                 }, this);}, this);
