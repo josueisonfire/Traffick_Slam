@@ -49,8 +49,13 @@ var playState = {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.runKey = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+<<<<<<< HEAD
         this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);
 
+=======
+        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);        
+        this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I);        
+>>>>>>> 95bb8bc34204755beb4dc437487b412d5304a15e
         //lane x values
         this.lanes = [60, 190, 320, 450, 570];
 
@@ -62,6 +67,13 @@ var playState = {
             this.playerAnimate();
             this.playerJump();
         }
+        //cheats
+        this.cheatKeyI.onDown.add(function(){
+            if (this.player.invincible = false)
+            {this.player.invincible = true;}
+            else
+            {this.player.invincible = false;}
+            }, this);
         //infinite loop of background images
         this.updateBackground();
 
@@ -73,14 +85,20 @@ var playState = {
         game.debug.text("player.goingDown:  "+this.player.goingDown, 32, 160);
         game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
+<<<<<<< HEAD
         game.debug.text("cartimer:          "+this.carTimer, 32, 220);
 
+=======
+        game.debug.text("invincible:        "+this.player.invincible, 32, 220);
+        
+>>>>>>> 95bb8bc34204755beb4dc437487b412d5304a15e
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
 
         //player sprint
         if(!this.player.jumped){
             if (this.runKey.isDown){
+        
                 this.player.maxSpeed = 750;
             }
             else{
@@ -101,8 +119,8 @@ var playState = {
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.world.centerX, this.world.height -300, 'player');
-        //this.player.anchor.setTo(0.5,0.5);
         this.player.scale.setTo(2,2);
+        //this.player.anchor.setTo(0.5,0.5);
         //boolean variables
         this.player.isDead = false;
         this.player.jumped = false;
@@ -110,6 +128,8 @@ var playState = {
         this.player.goingDown = false;
         this.player.isFacingUp = true;
         this.player.isOnCar = false;
+        this.player.disableControls = false;
+        this.player.invincible = false;
         //speed properties
         this.player.maxSpeed = 300;
         this.player.accel = 20;
@@ -165,7 +185,7 @@ var playState = {
         this.cars.enableBody = true;
         this.cars.createMultiple(20, 'car1');
         this.cars.forEach(function(car){
-            car.scale.setTo(2.5, 2.5);
+            car.scale.setTo(2.8, 2.8);
         })
         this.carTimer = true;
     },
@@ -181,13 +201,15 @@ var playState = {
     },
 
     playerMovement: function(){
-        if(this.crouchKey.isDown && !this.player.jumped){
-            this.player.body.velocity.setTo(0,0);
-        }else{
-            if(this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
+        if(this.crouchKey.isDown && !this.player.jumped)
+            this.player.disableControls = true;
+        else
+            this.player.disableControls = false;
+        
+            if(!this.player.disableControls && this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
                 this.player.body.velocity.y -= this.player.accel;
             }
-            else if (this.cursors.down.isDown && this.player.body.velocity.y < this.player.maxSpeed){
+            else if (!this.player.disableControls && this.cursors.down.isDown && this.player.body.velocity.y < this.player.maxSpeed){
                 this.player.body.velocity.y += this.player.accel;
             }
             else{
@@ -197,10 +219,10 @@ var playState = {
                 if (this.player.body.velocity.y < this.player.accel && this.player.body.velocity.y > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.y = 0;
             }
-            if(this.cursors.left.isDown && this.player.body.velocity.x > -this.player.maxSpeed){
+            if(!this.player.disableControls && this.cursors.left.isDown && this.player.body.velocity.x > -this.player.maxSpeed){
                 this.player.body.velocity.x -= this.player.accel;
             }
-            else if(this.cursors.right.isDown && this.player.body.velocity.x < this.player.maxSpeed){
+            else if(!this.player.disableControls && this.cursors.right.isDown && this.player.body.velocity.x < this.player.maxSpeed){
                 this.player.body.velocity.x += this.player.accel;
             }
             else{
@@ -210,7 +232,7 @@ var playState = {
                 if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.x = 0;
             }
-        }
+        
             //TODO:: slow down diagonal movements --by a factor of 1/sqrt(2)? probably not--
             //if(2keyspressed for any 4 directions) player velocity / sqrt(2)
         //track the maximum distance player has traveled
@@ -219,10 +241,15 @@ var playState = {
 
     playerJump: function(){
     //TODO:: drifting bug after jumping; has to do with changing scale probably
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 95bb8bc34204755beb4dc437487b412d5304a15e
         if(this.player.jumped){
             //change spd values for air controls
             this.player.accel = 8;
-            this.player.friction = 0.9999;
+            this.player.friction = 1;
+            this.player.maxSpeed = 1000;
         //change sprite size for going up
             if(this.player.goingUp){
                 this.player.scale.x += this.player.jumpScale;
@@ -318,7 +345,18 @@ var playState = {
             }
         }
     },
+<<<<<<< HEAD
 
+=======
+    
+    playerDead: function(){
+        if (!this.player.invincible && !this.player.isDead){
+        this.player.isDead = true;
+        this.player.body.velocity.setTo(0,0);
+        this.player.animations.play('dying');
+        }
+    },
+>>>>>>> 95bb8bc34204755beb4dc437487b412d5304a15e
     createCars: function(){
         //TODO:: if number of cars on screen < a number then create a random car KEEP TERM
         //generate a random # to determine the which lane to spawn car\
@@ -334,7 +372,7 @@ var playState = {
         var car = this.cars.getFirstDead();
         if (lane != 0){
             car.reset(this.lanes[lane], this.camera.y + 640);
-            car.body.velocity.y = -600/lane;
+            car.body.velocity.y = -500 + 100*lane;
         }
         else{
             car.reset(this.lanes[lane], this.camera.y - 140);
@@ -349,12 +387,12 @@ var playState = {
     },
 
     carOverlap: function(player, car){
-        //if player is inside the zone (110% of the car sprite + more room down)
-        if(player.x > car.x - car.width * 0.1 && player.x + player.width < car.x + car.width *1.1 && player.y > car.y - car.height * 0.1 && player.y + player.height < car.y + car.height *1.5)
+        //if player is inside the zone (130% of the car sprite + more room down)
+        if(player.x > car.x - car.width * 0.3 && player.x + player.width < car.x + car.width *1.3 && player.y > car.y - car.height * 0.3 && player.y + player.height < car.y + car.height *1.8)
             player.isOnCar = true;
         else{
             player.isOnCar = false;
-            player.animations.play('dying');
+            this.playerDead();
         }
 
         if(player.isOnCar && this.crouchKey.isDown){
