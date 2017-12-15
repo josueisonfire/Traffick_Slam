@@ -5,5 +5,6 @@ var bootState =
         game.physics.startSystem(Phaser.Physics.ARCADE);
         //call the load state
         game.state.start('menu');
+        
     }
 };
