@@ -49,13 +49,8 @@ var playState = {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.runKey = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-<<<<<<< HEAD
-        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);
-
-=======
         this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);        
-        this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I);        
->>>>>>> 95bb8bc34204755beb4dc437487b412d5304a15e
+        this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I); 
         //lane x values
         this.lanes = [60, 190, 320, 450, 570];
 
@@ -85,13 +80,9 @@ var playState = {
         game.debug.text("player.goingDown:  "+this.player.goingDown, 32, 160);
         game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
-<<<<<<< HEAD
         game.debug.text("cartimer:          "+this.carTimer, 32, 220);
-
-=======
         game.debug.text("invincible:        "+this.player.invincible, 32, 220);
         
->>>>>>> 95bb8bc34204755beb4dc437487b412d5304a15e
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
 
@@ -241,10 +232,7 @@ var playState = {
 
     playerJump: function(){
     //TODO:: drifting bug after jumping; has to do with changing scale probably
-<<<<<<< HEAD
-=======
-        
->>>>>>> 95bb8bc34204755beb4dc437487b412d5304a15e
+
         if(this.player.jumped){
             //change spd values for air controls
             this.player.accel = 8;
@@ -345,10 +333,7 @@ var playState = {
             }
         }
     },
-<<<<<<< HEAD
 
-=======
-    
     playerDead: function(){
         if (!this.player.invincible && !this.player.isDead){
         this.player.isDead = true;
@@ -356,7 +341,6 @@ var playState = {
         this.player.animations.play('dying');
         }
     },
->>>>>>> 95bb8bc34204755beb4dc437487b412d5304a15e
     createCars: function(){
         //TODO:: if number of cars on screen < a number then create a random car KEEP TERM
         //generate a random # to determine the which lane to spawn car\
