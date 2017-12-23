@@ -13,7 +13,7 @@ var playState = {
         this.load.spritesheet('car7', 'assets/cars/cars (20x35)/UNICORN CAR.png', 20, 35);
         this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
         this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
-        /*//load all sounds
+        //load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
         game.load.audio('click', 'assets/click.mp3')
         game.load.audio('music', 'assets/main_st.mp3');
@@ -21,7 +21,7 @@ var playState = {
         game.load.audio('smallcarhorn', 'assets/smallcarhorn.mp3');
         game.load.audio('carnhorn', 'assets/carhorn.mp3');
         game.load.audio('pickuphorn', 'assets/truckhorn.mp3');
-        game.load.audio('bushorn', 'assets/bushorn.mp3');*/
+        game.load.audio('bushorn', 'assets/bushorn.mp3');
     },
     // function o manage all the sounds.
     playSound: function(soundtype, loop, timeout)
@@ -36,6 +36,9 @@ var playState = {
 
         //create background images to repeat
         this.createBackground();
+        
+        //lane x values
+        this.lanes = [60, 190, 320, 450, 570];
 
         //create cars
         this.initializeCars();
@@ -49,26 +52,42 @@ var playState = {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.runKey = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);        
-        this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I); 
-        //lane x values
-        this.lanes = [60, 190, 320, 450, 570];
-
+        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);
+        this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I);
+        //cheats
+        this.cheatKeyI.onDown.add(function(){
+            if (this.player.invincible == false)
+            this.player.invincible = true;
+            else
+            this.player.invincible = false;
+            }, this);
+        
+        this.cursors.left.onDown.add(function(){
+            if(!this.player.disableControls){
+                if(this.player.lane > 1){
+                    this.player.lane -= 1;
+                }                
+            }
+        }, this);
+        this.cursors.right.onDown.add(function(){
+            if(!this.player.disableControls){
+                if(this.player.lane < 4){
+                    this.player.lane += 1;
+                }                
+            }
+        }, this);
+        this.playerChangeLanes();
     },
 
     update: function(){
         if (!this.player.isDead){
-            this.playerMovement();
             this.playerAnimate();
-            this.playerJump();
+            if(!this.player.disableControls){
+                this.playerMovement();
+                this.playerJump();
+            }
         }
-        //cheats
-        this.cheatKeyI.onDown.add(function(){
-            if (this.player.invincible = false)
-            {this.player.invincible = true;}
-            else
-            {this.player.invincible = false;}
-            }, this);
+        
         //infinite loop of background images
         this.updateBackground();
 
@@ -76,19 +95,18 @@ var playState = {
         game.debug.text("X:                 " + this.player.x, 32, 32);
         game.debug.text("Y:                 " + this.player.y, 32, 64);
         game.debug.text("player.jumped:     "+this.player.jumped, 32, 120);
-        game.debug.text("player.goingUp:    "+this.player.goingUp, 32, 140);
+        game.debug.text("player.lane:       "+this.player.lane, 32, 140);
         game.debug.text("player.goingDown:  "+this.player.goingDown, 32, 160);
         game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
         game.debug.text("invincible:        "+this.player.invincible, 32, 220);
-        
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
 
         //player sprint
         if(!this.player.jumped){
             if (this.runKey.isDown){
-        
+
                 this.player.maxSpeed = 750;
             }
             else{
@@ -101,14 +119,13 @@ var playState = {
         //if a car goes off screen + 600 then kill that car
         this.cars.forEach(this.destroyCar);
 
-        //if player is not in the air, check for overlap with cars
-        if(!this.player.jumped)
+        //check for overlap with cars
             this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
     },
 
 //create-related functions
     createPlayer: function(){
-        this.player = game.add.sprite(this.world.centerX, this.world.height -300, 'player');
+        this.player = game.add.sprite(this.lanes[1]/*TODO: change if needed*/, this.world.height -300, 'player');
         this.player.scale.setTo(2,2);
         //this.player.anchor.setTo(0.5,0.5);
         //boolean variables
@@ -125,6 +142,8 @@ var playState = {
         this.player.accel = 20;
         this.player.friction = 0.9;
         this.player.jumpScale = 0.02;
+        //lane position; default 1 TODO: change if needed
+        this.player.lane = 1;
 
         //variables to track where the player started and track change in y distance
         this.player.yOrig = this.player.y;
@@ -180,7 +199,12 @@ var playState = {
         })
         this.carTimer = true;
     },
-
+    
+    playerChangeLanes: function(){
+        //function that handles the player changing lanes, using left and right keys
+        
+    },
+    
 //update-related functions
     updateBackground: function(){
         this.backgrounds.forEachAlive( function(bg){
@@ -192,15 +216,17 @@ var playState = {
     },
 
     playerMovement: function(){
+        //up and down movements
+        /*OLD CROUCH STUFF
         if(this.crouchKey.isDown && !this.player.jumped)
             this.player.disableControls = true;
         else
             this.player.disableControls = false;
-        
-            if(!this.player.disableControls && this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
+            */
+            if(this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
                 this.player.body.velocity.y -= this.player.accel;
             }
-            else if (!this.player.disableControls && this.cursors.down.isDown && this.player.body.velocity.y < this.player.maxSpeed){
+            else if (this.cursors.down.isDown && this.player.body.velocity.y < this.player.maxSpeed){
                 this.player.body.velocity.y += this.player.accel;
             }
             else{
@@ -210,25 +236,26 @@ var playState = {
                 if (this.player.body.velocity.y < this.player.accel && this.player.body.velocity.y > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.y = 0;
             }
-            if(!this.player.disableControls && this.cursors.left.isDown && this.player.body.velocity.x > -this.player.maxSpeed){
-                this.player.body.velocity.x -= this.player.accel;
+            
+        // LEFT-RIGHT MOVEMENTS
+        if(this.player.position.x < this.lanes[this.player.lane]){
+            this.player.position.x += 10;
+            if(this.player.position.x > this.lanes[this.player.lane]-20){
+                this.player.position.x = this.lanes[this.player.lane];
             }
-            else if(!this.player.disableControls && this.cursors.right.isDown && this.player.body.velocity.x < this.player.maxSpeed){
-                this.player.body.velocity.x += this.player.accel;
+        }
+        else if(this.player.position.x > this.lanes[this.player.lane]){
+            this.player.position.x -= 10;
+            if(this.player.position.x < this.lanes[this.player.lane]+20){
+                this.player.position.x = this.lanes[this.player.lane];
             }
-            else{
-                //slowing down; friction-like effect
-                this.player.body.velocity.x *= this.player.friction;
-                //stop entirely when velocity is too small (while on ground)
-                if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
-                    this.player.body.velocity.x = 0;
-            }
-        
-            //TODO:: slow down diagonal movements --by a factor of 1/sqrt(2)? probably not--
-            //if(2keyspressed for any 4 directions) player velocity / sqrt(2)
+        }
+            
+            
         //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
     },
+    
 
     playerJump: function(){
     //TODO:: drifting bug after jumping; has to do with changing scale probably
@@ -335,7 +362,6 @@ var playState = {
             }
         }
     },
-
     playerDead: function(){
         if (!this.player.invincible && !this.player.isDead){
         this.player.isDead = true;
@@ -373,17 +399,20 @@ var playState = {
     },
 
     carOverlap: function(player, car){
+        if(!player.jumped){
         //if player is inside the zone (130% of the car sprite + more room down)
         if(player.x > car.x - car.width * 0.3 && player.x + player.width < car.x + car.width *1.3 && player.y > car.y - car.height * 0.3 && player.y + player.height < car.y + car.height *1.8)
             player.isOnCar = true;
         else{
-            player.isOnCar = false;
-            this.playerDead();
+            //revamped to: player starts on car, only dies by obstacles or hitting the road
+            //player.isOnCar = false;
+            //this.playerDead();
         }
 
-        if(player.isOnCar && this.crouchKey.isDown){
+        if(player.isOnCar){
             player.body.velocity.x = car.body.velocity.x;
             player.body.velocity.y = car.body.velocity.y;
+        }
         }
 
     }

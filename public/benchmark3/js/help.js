@@ -47,7 +47,7 @@ var helpState =
         menu_backButton.inputEnabled = true;
         menu_backButton.events.onInputDown.add(this.goBack, this);
         text = this.addtext(400,525,'BACK', 30);
-        insTie4 = this.addtext(400,250,'Help Jamie save her kidnapped wife amidst this traffic! \nJump on cars and use them to travel forward! \n \n But Beware  of falling down and getting run over, \ngetting caught and shot bt the police, or stepping on a pointy \ntaxi sign, as they may kill you! \n \n Good Luck!',20);
+        insTie4 = this.addtext(400,250,'Help Jamie save her kidnapped wife amidst this traffic! \nJump on cars and use them to travel forward! \n \n But beware  of falling down and getting run over, \ngetting caught and shot by the police, or stepping on a pointy \ntaxi sign, as they may kill you! \n \n Good Luck!',20);
     },
 
     goBack: function()
