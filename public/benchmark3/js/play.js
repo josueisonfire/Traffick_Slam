@@ -13,6 +13,7 @@ var playState = {
         this.load.spritesheet('car7', 'assets/cars/cars (20x35)/UNICORN CAR.png', 20, 35);
         this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
         this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
+        this.load.image('wall', 'assets/invwall.png');
         //load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
         game.load.audio('click', 'assets/click.mp3')
@@ -44,6 +45,9 @@ var playState = {
         this.initializeCars();
         //create player character
         this.createPlayer();
+        
+        //create 2 inv walls
+        this.createWalls();
 
         //player animations
         this.createPlayerAnimations();
@@ -62,20 +66,6 @@ var playState = {
             this.player.invincible = false;
             }, this);
         
-        this.cursors.left.onDown.add(function(){
-            if(!this.player.disableControls){
-                if(this.player.lane > 1){
-                    this.player.lane -= 1;
-                }                
-            }
-        }, this);
-        this.cursors.right.onDown.add(function(){
-            if(!this.player.disableControls){
-                if(this.player.lane < 4){
-                    this.player.lane += 1;
-                }                
-            }
-        }, this);
         this.playerChangeLanes();
     },
 
@@ -87,6 +77,14 @@ var playState = {
                 this.playerJump();
             }
         }
+        //walls follow player
+        this.wall1.y = this.player.y;
+        this.wall2.y = this.player.y;
+        
+        //player collide with walls
+        this.physics.arcade.collide(this.player, this.wall1);
+        this.physics.arcade.collide(this.player, this.wall2);
+
         
         //infinite loop of background images
         this.updateBackground();
@@ -96,7 +94,7 @@ var playState = {
         game.debug.text("Y:                 " + this.player.y, 32, 64);
         game.debug.text("player.jumped:     "+this.player.jumped, 32, 120);
         game.debug.text("player.lane:       "+this.player.lane, 32, 140);
-        game.debug.text("player.goingDown:  "+this.player.goingDown, 32, 160);
+        game.debug.text("gravityX:          "+this.player.body.gravity.x, 32, 160);
         game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
         game.debug.text("invincible:        "+this.player.invincible, 32, 220);
@@ -137,6 +135,7 @@ var playState = {
         this.player.isOnCar = false;
         this.player.disableControls = false;
         this.player.invincible = false;
+        this.player.onLane;
         //speed properties
         this.player.maxSpeed = 300;
         this.player.accel = 20;
@@ -152,6 +151,7 @@ var playState = {
         //player physics
         game.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true;
+        this.player.body.gravity.x = -300;
     },
 
     createPlayerAnimations: function(){
@@ -188,7 +188,19 @@ var playState = {
         this.backgroundCounter++;
         return background;
     },
-
+    
+    createWalls: function(){
+        this.wall1 = this.add.sprite(this.lanes[this.player.lane-1]+20, this.player.y, 'wall');
+        this.wall2 = this.add.sprite(this.lanes[this.player.lane+1], this.player.y, 'wall');
+        this.wall1.anchor.setTo(0, 0.5);
+        this.wall2.anchor.setTo(0, 0.5);
+        this.physics.arcade.enable(this.wall1);
+        this.physics.arcade.enable(this.wall2);
+        this.wall1.body.immovable = true;
+        this.wall2.body.immovable = true;
+        //TODO: maek invisible
+    },
+    
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
@@ -205,6 +217,26 @@ var playState = {
     playerChangeLanes: function(){
         //function that handles the player changing lanes, using left and right keys
         
+        this.cursors.left.onDown.add(function(){
+            if(!this.player.disableControls){
+                if(this.player.lane > 1){
+                    this.player.lane -= 1;
+                    this.player.body.gravity.x = -300;
+                    //this.wall1.x = this.lanes[this.player.lane-1]+20;
+                    this.wall2.x = this.lanes[this.player.lane+1];
+                }                
+            }
+        }, this);
+        this.cursors.right.onDown.add(function(){
+            if(!this.player.disableControls){
+                if(this.player.lane < 4){
+                    this.player.lane += 1;
+                    this.player.body.gravity.x = 300;
+                    //this.wall1.x = this.lanes[this.player.lane-1]+20;
+                    this.wall2.x = this.lanes[this.player.lane+1];
+                }                
+            }
+        }, this);
     },
     
 //update-related functions
@@ -240,18 +272,21 @@ var playState = {
             }
             
         // LEFT-RIGHT MOVEMENTS
+        
+        /*
         if(this.player.position.x < this.lanes[this.player.lane]){
-            this.player.position.x += 10;
-            if(this.player.position.x > this.lanes[this.player.lane]-20){
+            this.player.position.x += 0.1;
+            if(this.player.position.x > this.lanes[this.player.lane]-40){
                 this.player.position.x = this.lanes[this.player.lane];
             }
         }
         else if(this.player.position.x > this.lanes[this.player.lane]){
-            this.player.position.x -= 10;
-            if(this.player.position.x < this.lanes[this.player.lane]+20){
+            this.player.position.x -= 0.1;
+            if(this.player.position.x < this.lanes[this.player.lane]+40){
                 this.player.position.x = this.lanes[this.player.lane];
             }
-        }
+        }*/
+            
             
             
         //track the maximum distance player has traveled
