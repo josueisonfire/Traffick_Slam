@@ -172,8 +172,9 @@ var playState = {
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
-        this.cars.createMultiple(20, 'car1');
-        this.cars.forEach(function(car){
+        this.cars.createMultiple(20, 'car7');
+        this.cars.forEach(function(car)
+        {
             car.scale.setTo(2.8, 2.8);
         })
         this.carTimer = true;

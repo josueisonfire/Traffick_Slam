@@ -84,15 +84,12 @@ var menuState =
 
     start: function()
     {
-        music.stop()
         game.state.start('play');
-
     },
 
     //event listener.
     startGame: function()
     {
-        music.stop()
         click.play()
         this.start();
     },
