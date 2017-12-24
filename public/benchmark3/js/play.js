@@ -46,6 +46,10 @@ var playState = {
         //create player character
         this.createPlayer();
         
+        //starting car
+        this.startCar = this.cars.getFirstDead();
+        this.startCar.reset(this.player.x, this.player.y);
+        this.startCar.body.velocity.y = -200;
         //create 2 inv walls
         //this.createWalls();
 
@@ -66,7 +70,6 @@ var playState = {
             this.player.invincible = false;
             }, this);
         
-        this.playerChangeLanes();
     },
 
     update: function(){
@@ -94,11 +97,11 @@ var playState = {
         game.debug.text("X:                 " + this.player.x, 32, 32);
         game.debug.text("Y:                 " + this.player.y, 32, 64);
         game.debug.text("player.jumped:     "+this.player.jumped, 32, 120);
-        game.debug.text("player.lane:       "+this.player.lane, 32, 140);
-        game.debug.text("player onlane:     "+this.player.onLane, 32, 160);
+        //game.debug.text("player.lane:       "+this.player.lane, 32, 140);
+        game.debug.text("player oncar:      "+this.player.isOnCar, 32, 160);
         game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
-        game.debug.text("lane position:     "+this.lanes[this.player.lane], 32, 220);
+        //game.debug.text("lane position:     "+this.lanes[this.player.lane], 32, 220);
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
 
@@ -115,11 +118,11 @@ var playState = {
 
         //periodically create cars
         this.createCars();
-        //if a car goes off screen + 600 then kill that car
+        //if a car goes off screen + 200 then kill that car
         this.cars.forEach(this.destroyCar);
 
         //check for overlap with cars
-            this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
+        this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
     },
 
 //create-related functions
@@ -136,14 +139,12 @@ var playState = {
         this.player.isOnCar = false;
         this.player.disableControls = false;
         this.player.invincible = false;
-        this.player.onLane;
         //speed properties
         this.player.maxSpeed = 300;
         this.player.accel = 20;
         this.player.friction = 0.9;
         this.player.jumpScale = 0.02;
-        //lane position; default 1 TODO: change if needed
-        this.player.lane = 1;
+        this.player.onCarspeed = 20;
 
         //variables to track where the player started and track change in y distance
         this.player.yOrig = this.player.y;
@@ -189,7 +190,7 @@ var playState = {
         return background;
     },
     
-    createWalls: function(){
+    createWalls: function(){/*
         this.wall1 = this.add.sprite(this.lanes[this.player.lane-1]+20, this.player.y, 'wall');
         this.wall2 = this.add.sprite(this.lanes[this.player.lane+1], this.player.y, 'wall');
         this.wall1.anchor.setTo(0, 0.5);
@@ -198,15 +199,19 @@ var playState = {
         this.physics.arcade.enable(this.wall2);
         this.wall1.body.immovable = true;
         this.wall2.body.immovable = true;
-        //TODO: maek invisible
+        //TODO: maek invisible*/
     },
     
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
-        this.cars.createMultiple(20, 'car1');
-        //this.cars.createMultiple(3, ['car1','car2','car3','car4','car5','car6','car7']);
-        this.cars.createMultiple(20, 'car7');
+        this.cars.create(0,0, 'car1', null, false);
+        this.cars.create(0,0, 'car2', null, false);
+        this.cars.create(0,0, 'car3', null, false);
+        this.cars.create(0,0, 'car4', null, false);
+        this.cars.create(0,0, 'car5', null, false);
+        this.cars.create(0,0, 'car6', null, false);
+        this.cars.create(0,0, 'car7', null, false);
         this.cars.forEach(function(car)
         {
             car.scale.setTo(2.8, 2.8);
@@ -253,6 +258,9 @@ var playState = {
         else
             this.player.disableControls = false;
             */
+        if(this.player.onCar){
+        }
+        else{
             if(this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
                 this.player.body.velocity.y -= this.player.accel;
             }
@@ -266,38 +274,23 @@ var playState = {
                 if (this.player.body.velocity.y < this.player.accel && this.player.body.velocity.y > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.y = 0;
             }
-            
-        // LEFT-RIGHT MOVEMENTS
         
-        /*
-        if(this.player.x < this.lanes[this.player.lane] || this.player.x > this.lanes[this.player.lane]){
-            this.player.onLane = false;
+        // LEFT-RIGHT MOVEMENTS
+            if(this.cursors.left.isDown && this.player.body.velocity.x > -this.player.maxSpeed){
+                this.player.body.velocity.x -= this.player.accel;
             }
-        else{
-            this.player.onLane = true;
-        }
-        if(this.player.onLane){
-            if(this.cursors.right.isDown){
-                this.player.x+=1;
-            }
-            else if(this.cursors.left.isDown){
-                this.player.x-=1;
-            }
-        }
-        if(!this.player.onLane){
-            if(this.player.x < this.lanes[this.player.lane]){
-                this.player.x += 10;
-                this.player.onLane = false;
-            }
-            else if(this.player.x > this.lanes[this.player.lane]){
-                this.player.x -= 10;
-                this.player.onLane = false;
+            else if (this.cursors.right.isDown && this.player.body.velocity.x < this.player.maxSpeed){
+                this.player.body.velocity.x += this.player.accel;
             }
             else{
-                this.player.onLane = true;
+                //slowing down; friction-like effect
+                this.player.body.velocity.x *= this.player.friction;
+                //stop entirely when velocity is too small (while on ground)
+                if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
+                    this.player.body.velocity.x = 0;
             }
-        }*/
-            
+        
+        }
         //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
     },
@@ -416,47 +409,60 @@ var playState = {
         //TODO:: if number of cars on screen < a number then create a random car KEEP TERM
         //generate a random # to determine the which lane to spawn car\
         if (this.carTimer){
-            game.time.events.add(1000, function(){this.carTimer = true;}, this)
+            game.time.events.add(500, function(){this.carTimer = true;}, this)
             this.carTimer = false;
-            //TODO:: rng fix
-            this.createOneCar(Math.floor(Math.random() * 4.99));
+            this.createOneCar(Math.floor(Math.random() * 5));
         }
 
     },
     createOneCar: function(lane){
         var car = this.cars.getFirstDead();
-        if (lane != 0){
-            car.reset(this.lanes[lane], this.camera.y + 640);
-            car.body.velocity.y = -500 + 100*lane;
-        }
-        else{
-            car.reset(this.lanes[lane], this.camera.y - 140);
-            car.body.velocity.y = 500;
+        if(car != null){
+            if (lane != 0){
+                car.reset(this.lanes[lane], this.camera.y + 640);
+                car.body.velocity.y = this.player.body.velocity.y+(Math.random()-0.9)*100;
+            }
+            else{
+                car.reset(this.lanes[lane], this.camera.y - 140);
+                car.body.velocity.y = 500;
+            }
         }
 
     },
     destroyCar: function(car){
-        if(car.y > game.camera.y + 1200 || car.y < game.camera.y - 600){
+        if(car.y > game.camera.y + 800 || car.y < game.camera.y - 200){
             car.kill();
         }
     },
 
     carOverlap: function(player, car){
         if(!player.jumped){
-        //if player is inside the zone (130% of the car sprite + more room down)
-        if(player.x > car.x - car.width * 0.3 && player.x + player.width < car.x + car.width *1.3 && player.y > car.y - car.height * 0.3 && player.y + player.height < car.y + car.height *1.8)
-            player.isOnCar = true;
-        else{
-            //revamped to: player starts on car, only dies by obstacles or hitting the road
-            //player.isOnCar = false;
-            //this.playerDead();
-        }
+        //if player is inside the zone 
+            /*if(player.x+player.width/2 > car.x && player.x+player.width/2 < car.x + car.width && player.y+player.height/2 > car.y && player.y+player.height/2 < car.y + car.height)
+                player.isOnCar = true;
+            else{
+                player.isOnCar = false;
+            }*/
 
-        if(player.isOnCar){
-            player.body.velocity.x = car.body.velocity.x;
-            player.body.velocity.y = car.body.velocity.y;
+            
+                if(this.cursors.up.isDown)
+                    player.body.velocity.y = car.body.velocity.y-this.player.onCarspeed;
+                else if(this.cursors.down.isDown)
+                    player.body.velocity.y = car.body.velocity.y+this.player.onCarspeed;
+                else
+                    player.body.velocity.y = car.body.velocity.y;
+                
+                if(this.cursors.left.isDown)
+                    player.body.velocity.x = car.body.velocity.x-this.player.onCarspeed;
+                else if(this.cursors.right.isDown)
+                    player.body.velocity.x = car.body.velocity.x+this.player.onCarspeed;
+                else
+                    player.body.velocity.x = car.body.velocity.x;
+                
         }
-        }
-
+    },
+    
+    carAI: function(){
+        //TODO: implement
     }
 };
