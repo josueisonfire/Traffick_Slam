@@ -236,7 +236,7 @@ var playState = {
             //invisible box
             car.frontBox = game.add.sprite(car.x-car.body.width/4, car.y-120, 'wall');
             car.addChild(car.frontBox);
-            car.children.enableBody = true;
+            playState.physics.arcade.enable(car.frontBox);
         })
         this.carTimer = true;
     },
@@ -479,6 +479,6 @@ var playState = {
             car.body.velocity.y += 20;
         }
         
-        game.debug.text("current car sees?:  "+car.seeCar, 32, 232);
+        game.debug.text("current car sees?:  "+car.frontBox.body.velocity.y, 32, 232);
     }
 };
