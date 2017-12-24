@@ -11,7 +11,8 @@ var playState = {
         this.load.spritesheet('car5', 'assets/cars/cars (40x70)/RED CAR.png', 40, 70);
         this.load.spritesheet('car6', 'assets/cars/cars (40x70)/TAXI.png', 40, 70);
         this.load.spritesheet('car7', 'assets/cars/cars (40x70)/UNICORN CAR.png', 40, 70);
-        this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
+        this.load.spritesheet('sports', 'assets/cars/sportz car (40x74)/Sports Car.png', 20, 37);
+        this.load.spritesheet('truck', 'assets/cars/pickup (48x80)/pickup truck.png', 24, 40);
         this.load.spritesheet('policecar', 'assets/cars/POLICE CAR.png', 40,70);
         this.load.spritesheet('wall', 'assets/invwall.png', 40, 70);
         this.load.image('retry', 'assets/retry.png');
@@ -26,9 +27,55 @@ var playState = {
         game.load.audio('bushorn', 'assets/bushorn.mp3');
     },
     // function o manage all the sounds.
-    playSound: function(soundtype, loop, timeout)
+    // soundtype:
+    // -1 = stop all sounds.
+    // 0 = hoverslide
+    // 1 = click
+    // 2 = music
+    // 3 = carhorn
+    // 4 = pickuphorn
+    // 5 = bus_horn
+    // 6 = smallcarhorn
+    playSound: function(soundtype)
     {
+      switch (soundstype)
+      {
+        case -1:
+          //stop all sounds.
+          slide.stop();
+          click.stop();
+          music.stop();
+          carhorn.stop();
+          pickuphorn.stop();
+          bushorn.stop();
+          smallcarhorn.stop();
 
+        case 0:
+          //play hoverslide sounds.
+          slide.play();
+          break;
+        case 1:
+          click.play();
+          break;
+        case 2:
+          music.play();
+          break;
+        case 3:
+          carhorn.play();
+          break;
+        case 4:
+          pickuphorn.play()
+          break;
+        case 5:
+          bushorn.play();
+          break;
+        case 6:
+          smallcarhorn.play();
+          break;
+        default:
+          //no sounds is played.
+
+      }
     },
 
     create: function(){
@@ -81,6 +128,23 @@ var playState = {
                 this.invmes2 = this.add.text(this.player.x, this.player.y, 'Godmode Deactivated');
             }
             }, this);
+        //add all sounds:
+        // -1 = stop all sounds.
+        // 0 = hoverslide
+        slide = game.add.audio('slide');
+        // 1 = click
+        click = game.add.audio('click');
+        // 2 = music
+        music = game.add.audio('music');
+        // 3 = carhorn
+        carhorn = game.add.audio("carnhorn");
+        // 4 = pickuphorn
+        pickuphorn = game.add.audio('pickuphorn');
+        // 5 = bus_horn
+        bushorn = game.add.audio('bushorn');
+        // 6 = smallcarhorn
+        smallcarhorn = game.add.audio('smallcarnhorn');
+
     },
 
     update: function(){
@@ -483,6 +547,7 @@ var playState = {
         if(car1.id != car2.id && car2.lane == car1.lane){
             if(car1.y < car2.y && car1.y > car2.y + car1.body.velocity.y/2 - 100){
                 car2.body.velocity.y *= 0.8;
+                playSound(3);
             }
         }
     },
