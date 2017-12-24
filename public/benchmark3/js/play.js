@@ -125,7 +125,7 @@ var playState = {
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.lanes[1]/*TODO: change if needed*/, this.world.height -300, 'player');
-        //this.player.scale.setTo(2,2);
+        this.player.scale.setTo(2,2);
         //this.player.anchor.setTo(0.5,0.5);
         //boolean variables
         this.player.isDead = false;
