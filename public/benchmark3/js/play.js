@@ -12,8 +12,9 @@ var playState = {
         this.load.spritesheet('car6', 'assets/cars/cars (40x70)/TAXI.png', 40, 70);
         this.load.spritesheet('car7', 'assets/cars/cars (40x70)/UNICORN CAR.png', 40, 70);
         this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
-        this.load.spritesheet('policecar', 'assets/cars/POLICE CAR.png', 40,70);
+        this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
         this.load.spritesheet('wall', 'assets/invwall.png', 40, 70);
+        this.load.image('retry', 'retry,png');
         //load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
         game.load.audio('click', 'assets/click.mp3')
@@ -37,7 +38,7 @@ var playState = {
 
         //create background images to repeat
         this.createBackground();
-
+        
         //lane x values
         this.lanes = [60, 205, 333, 473, 604];
 
@@ -45,14 +46,17 @@ var playState = {
         this.initializeCars();
         //create player character
         this.createPlayer();
-
+        
         //starting car
         this.startCar = this.cars.getFirstDead();
         this.startCar.reset(this.player.x, this.player.y);
+        this.startCar.lane = 1;
         this.startCar.body.velocity.y = -200;
         //create 2 inv walls
         //this.createWalls();
-
+        //retry screen
+        this.retryScreen = this.add.sprite(0,0, 'retry');
+        this.retryScreen.alpha = 0;
         //player animations
         this.createPlayerAnimations();
 
@@ -64,12 +68,17 @@ var playState = {
         this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I);
         //cheats
         this.cheatKeyI.onDown.add(function(){
-            if (this.player.invincible == false)
-            this.player.invincible = true;
-            else
-            this.player.invincible = false;
+            if (!this.player.invincible && !this.player.isDead){
+                this.player.invincible = true;
+                this.invmes = this.add.text(this.player.x, this.player.y, 'Godmode Activated');
+                this.invmes2.destroy();
+            }
+            else{
+                this.player.invincible = false;
+                this.invmes.destroy();
+                this.invmes2 = this.add.text(this.player.x, this.player.y, 'Godmode Deactivated');
+            }
             }, this);
-
     },
 
     update: function(){
@@ -84,12 +93,15 @@ var playState = {
         /*/walls follow player
         this.wall1.y = this.player.y;
         this.wall2.y = this.player.y;
-
+        
         //player collide with walls
         this.physics.arcade.collide(this.player, this.wall1);
         this.physics.arcade.collide(this.player, this.wall2);*/
-
-
+        
+        //screens follow camera
+        this.retryScreen.x = this.camera.x;
+        this.retryScreen.y = this.camera.y;
+        
         //infinite loop of background images
         this.updateBackground();
 
@@ -120,13 +132,13 @@ var playState = {
         this.createCars();
         //if a car goes off screen + 200 then kill that car
         this.cars.forEach(this.destroyCar);
-
+        
         //car AI
-        this.cars.forEach(this.carAI);
+        this.cars.forEachAlive(this.carAI, this);
 
         //check for overlap with cars
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
-
+        
         //player death
         if(!this.player.isOnCar && !this.player.jumped){
             this.playerDeath();
@@ -146,7 +158,7 @@ var playState = {
         this.player.disableControls = false;
         this.player.invincible = false;
         //speed properties
-        this.player.speedX = 200;
+        this.player.speedX = 220;
         this.player.accel = 20;
         this.player.frictionX = 0.9;
         this.player.frictionY = 1;
@@ -160,8 +172,8 @@ var playState = {
         //player physics
         this.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true;
-
-        //change hitbox
+        
+        //change hitbox        
         this.player.anchor.setTo(0.5, 1);
         this.player.body.height = 34;
         this.player.body.width = 20;
@@ -178,10 +190,10 @@ var playState = {
         this.player.animations.add('jumpDown', game.math.numberArray(34,39), 6*1000/this.player.jumpDuration, false);
         this.player.animations.add('dying', game.math.numberArray(40,46), 5, false);
         this.player.animations.add('runningLeftUp', game.math.numberArray(47,50), 5, true);
-        this.player.animations.add('jumpLeftUp', game.math.numberArray(51, 57), 6*1000/this.player.jumpDuration, true);
+        this.player.animations.add('jumpLeftUp', game.math.numberArray(51, 57), 6*1000/this.player.jumpDuration, false);
         this.player.animations.add('runningRightUp', game.math.numberArray(58,62), 5, true);
-        this.player.animations.add('jumpRightUp', game.math.numberArray(63, 68), 6*1000/this.player.jumpDuration, true);
-        this.player.animations.add('idleDown', game.math.numberArray(31,32), 5, true);
+        this.player.animations.add('jumpRightUp', game.math.numberArray(63, 68), 6*1000/this.player.jumpDuration, false);
+        this.player.animations.add('idleDown', game.math.numberArray(40,41), 5, true);
         this.player.animations.add('idleUp', game.math.numberArray(69,70), 5, true);
     },
 
@@ -200,7 +212,7 @@ var playState = {
         this.backgroundCounter++;
         return background;
     },
-
+    
     createWalls: function(){/*
         this.wall1 = this.add.sprite(this.lanes[this.player.lane-1]+20, this.player.y, 'wall');
         this.wall2 = this.add.sprite(this.lanes[this.player.lane+1], this.player.y, 'wall');
@@ -212,13 +224,13 @@ var playState = {
         this.wall2.body.immovable = true;
         //TODO: maek invisible*/
     },
-
+    
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
         for(var i= 1; i<8; i++){
-            this.tmpCar = this.cars.create(0,0, 'car'+i, null, false);
-            this.tmpCar.type = 'normal';
+            var tmpCar = this.cars.create(0,0, 'car'+i, null, false);
+            tmpCar.type = 'normal';
         }
         /*this.cars.create(0,0, 'car1', null, false);
         this.cars.create(0,0, 'car2', null, false);
@@ -227,29 +239,29 @@ var playState = {
         this.cars.create(0,0, 'car5', null, false);
         this.cars.create(0,0, 'car6', null, false);
         this.cars.create(0,0, 'car7', null, false);*/
+        var idCount = 0;
         this.cars.forEach(function(car)
         {
             car.anchor.setTo(0.5, 0.5)
             car.scale.setTo(2, 2);
             car.body.width *=1.8;
             car.body.height *=1.8;
-            //invisible box
-            car.frontBox = game.add.sprite(car.x-car.body.width/4, car.y-120, 'wall');
-            car.addChild(car.frontBox);
-            car.children.enableBody = true;
-        })
+            car.lane = 0;
+            car.id = idCount;
+            idCount++;
+        });
         this.carTimer = true;
     },
-
+    
     playerChangeLanes: function(){
         //function that handles the player changing lanes, using left and right keys UNUSED
-
+        
         this.cursors.left.onDown.add(function(){
             if(!this.player.disableControls){
                 if(this.player.lane > 1){
                     this.player.lane -= 1;
                     this.player.x -= 130;
-                }
+                }                
             }
         }, this);
         this.cursors.right.onDown.add(function(){
@@ -257,11 +269,11 @@ var playState = {
                 if(this.player.lane < 4){
                     this.player.lane += 1;
                     this.player.x += 130;
-                }
+                }                
             }
         }, this);
     },
-
+    
 //update-related functions
     updateBackground: function(){
         this.backgrounds.forEachAlive( function(bg){
@@ -294,7 +306,7 @@ var playState = {
                 if (this.player.body.velocity.y < this.player.accel && this.player.body.velocity.y > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.y = 0;
             }
-
+        
         // LEFT-RIGHT MOVEMENTS
             if(this.cursors.left.isDown){
                 this.player.body.velocity.x = -this.player.speedX;
@@ -309,17 +321,14 @@ var playState = {
                 if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.x = 0;
             }
-
+        
         }
         //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
     },
-
+    
 
     playerJump: function(){
-    //TODO:: drifting bug after jumping; has to do with changing scale probably
-
-        //TODO:: make player sprite go under car when on ground but appear on top of car when jumping/ oncar
 
         if(this.player.jumped){
             //change spd values for air controls
@@ -353,25 +362,12 @@ var playState = {
 
     playerAnimate: function(){
         if(this.player.jumped){
-            if(this.player.isFacingUp){
-                if(this.cursors.left.isDown){
-                    this.player.animations.play('jumpLeftUp');
-                }else if(this.cursors.right.isDown){
-                    this.player.animations.play('jumpRightUp');
-                }else{
-                    this.player.animations.play('jumpUp');
-                }
-            }else{
-                if(this.cursors.left.isDown){
-                    this.player.animations.play('jumpLeftDown');
-                }else if(this.cursors.right.isDown){
-                    this.player.animations.play('jumpRightDown');
-                }else{
+            if(this.player.isFacingUp)
+                    this.player.animations.play('jumpUp');                
+            else
                     this.player.animations.play('jumpDown');
-                }
-            }
-        }
-        else{
+            
+        }else{
             if(this.cursors.up.isDown){
                 if(this.cursors.left.isDown){
                     this.player.animations.play('runningLeftUp');
@@ -413,16 +409,18 @@ var playState = {
     },
     playerDeath: function(){
         if (!this.player.invincible && !this.player.isDead){
-        this.player.isDead = true;
-        this.player.body.velocity.setTo(0,0);
-        this.player.animations.play('dying');
+            this.player.isDead = true;
+            this.player.body.velocity.setTo(0,0);
+            this.player.animations.play('dying');
+            this.time.events.add(1000, function(){
+                this.retryScreen.alpha = 1;
+            }, this);
         }
     },
     createCars: function(){
-        //TODO:: if number of cars on screen < a number then create a random car KEEP TERM
         //generate a random # to determine the which lane to spawn car\
         if (this.carTimer){
-            game.time.events.add(500, function(){this.carTimer = true;}, this)
+            game.time.events.add(300, function(){this.carTimer = true;}, this)
             this.carTimer = false;
             this.createOneCar(Math.floor(Math.random() * 4)+1);
         }
@@ -433,7 +431,8 @@ var playState = {
         if(car != null){
             if (lane != 0){
                 car.reset(this.lanes[lane], this.camera.y + 680);
-                car.body.velocity.y = this.player.body.velocity.y-(Math.random())*100;
+                car.lane = lane;
+                car.body.velocity.y = this.player.body.velocity.y-(Math.floor(Math.random()*10+5))*10;
             }
         }
 
@@ -446,39 +445,42 @@ var playState = {
 
     carOverlap: function(player, car){
         if(!player.jumped){
-        //if player is inside the zone
+        //if player is inside the zone 
             /*if(player.x+player.width/2 > car.x && player.x+player.width/2 < car.x + car.width && player.y+player.height/2 > car.y && player.y+player.height/2 < car.y + car.height)
                 player.isOnCar = true;
             else{
                 player.isOnCar = false;
             }*/
 
-
+            
                 if(this.cursors.up.isDown)
                     player.body.velocity.y = car.body.velocity.y-this.player.onCarspeed;
                 else if(this.cursors.down.isDown)
                     player.body.velocity.y = car.body.velocity.y+this.player.onCarspeed;
                 else
                     player.body.velocity.y = car.body.velocity.y;
-
+                
                 if(this.cursors.left.isDown)
                     player.body.velocity.x = car.body.velocity.x-this.player.onCarspeed;
                 else if(this.cursors.right.isDown)
                     player.body.velocity.x = car.body.velocity.x+this.player.onCarspeed;
                 else
                     player.body.velocity.x = car.body.velocity.x;
-
+                //debug
+            
+        game.debug.text("current car.lane:       "+car.lane, 32, 140);
         }
     },
-
+    
     carAI: function(car){
-        //TODO: implement
-        car.seeCar = playState.physics.arcade.overlap(car.frontBox, this.cars);
-
-        if(car.seeCar){
-            car.body.velocity.y += 20;
+        //check if box intersects with any other cars
+        this.cars.forEachAlive(this.checkOverlap, this, car);
+    },
+    checkOverlap: function(car1, car2){
+        if(car1.id != car2.id && car2.lane == car1.lane){
+            if(car1.y < car2.y && car1.y > car2.y + car1.body.velocity.y/2 - 100){
+                car2.body.velocity.y *= 0.8;
+            }
         }
-
-        game.debug.text("current car sees?:  "+car.seeCar, 32, 232);
     }
 };

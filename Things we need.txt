@@ -1,3 +1,5 @@
 restart button
 car&chara sprites
 background img
+tutorial maybe? introduce to the player the game mechanics
+auto jumping to cars (without precision)???think about making the mechanics easy and fun
