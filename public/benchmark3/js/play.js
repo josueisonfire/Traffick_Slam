@@ -24,7 +24,7 @@ var playState = {
         this.load.spritesheet('car7', 'assets/cars/cars (40x70)/UNICORN CAR.png', 40, 70);
         this.load.spritesheet('sports', 'assets/cars/sportz car (40x74)/Sports Car.png', 20, 37);
         this.load.spritesheet('truck', 'assets/cars/pickup (48x80)/pickup truck.png', 24, 40);
-        this.load.spritesheet('policecar', 'assets/cars/POLICE CAR.png', 40,70);
+        this.load.spritesheet('policecar', 'assets/cars/cars (40x70)/POLICE CAR.png', 40,70);
         this.load.spritesheet('wall', 'assets/invwall.png', 40, 70);
         //load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
@@ -226,7 +226,7 @@ var playState = {
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
         
         //check victory condition
-        if(this.player.yChange >= levelNum*500){
+        if(this.player.yChange >= levelNum*5000){
             this.player.disableControls = true;
             levelNum += 1;
             game.state.start('victory');
@@ -324,7 +324,11 @@ var playState = {
         for(var i= 1; i<8; i++){
             var tmpCar = this.cars.create(0,0, 'car'+i, null, false);
             tmpCar.type = 'normal';
+            tmpCar.animations.add('vroom', game.math.numberArray(0,3), 5, true);
         }
+        var pcar = this.cars.create(0,0, 'policecar', null, false);
+        pcar.type = 'police'
+        pcar.animations.add('vroom', game.math.numberArray(0,8), 5, true);
         /*this.cars.create(0,0, 'car1', null, false);
         this.cars.create(0,0, 'car2', null, false);
         this.cars.create(0,0, 'car3', null, false);
@@ -544,6 +548,7 @@ var playState = {
             else{
                 player.isOnCar = false;
             }*/
+            if(car.type == 'normal'){
 
 
                 if(this.cursors.up.isDown)
@@ -559,20 +564,17 @@ var playState = {
                     player.body.velocity.x = car.body.velocity.x+this.player.onCarspeed;
                 else
                     player.body.velocity.x = car.body.velocity.x;
-
+            }
+            else{
+                this.playerDeath();
+            }
         }
     },
 
     carAI: function(car){
-        //TODO: implement
-        car.seeCar = playState.physics.arcade.overlap(car.frontBox, this.cars);
-
-        if(car.seeCar){
-            car.body.velocity.y += 20;
-        }
-
-        game.debug.text("current car sees?:  "+car.seeCar, 32, 232);
-        //check if box intersects with any other cars
+        //animations
+        car.animations.play('vroom');
+        //check if front intersects with any other cars
         this.cars.forEachAlive(this.checkOverlap, this, car);
     },
     checkOverlap: function(car1, car2){

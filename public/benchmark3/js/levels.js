@@ -1,4 +1,4 @@
-var victoryState = {
+var levelsState = {
     preload: function(){
         this.load.image('win', 'assets/victory.png');
 

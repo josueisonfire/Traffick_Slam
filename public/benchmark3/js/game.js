@@ -7,6 +7,7 @@ game.state.add('menu', menuState);
 game.state.add('play', playState);
 game.state.add('retry', retryState);
 game.state.add('victory', victoryState);
+game.state.add('levels', levelsState);
 
 var levelNum = 1;
 
