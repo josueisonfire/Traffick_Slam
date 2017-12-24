@@ -9,7 +9,10 @@ var toggle6 = true;
 var playState = {
     preload: function(){
         //load all assets
-        this.load.image('background', 'assets/background1.png');
+        this.load.image('background1', 'assets/background1.png');
+        this.load.image('background2', 'assets/background2.png');
+        this.load.image('background3', 'assets/background3.png');
+        this.load.image('background4', 'assets/background4.png');
         this.load.spritesheet('player', 'assets/player.png', 38, 50);
         this.load.spritesheet('bus', 'assets/cars/bus (60x100)/bus.png', 30, 50);
         this.load.spritesheet('car1', 'assets/cars/cars (40x70)/BLACK CAR.png', 40, 70);
@@ -221,6 +224,13 @@ var playState = {
 
         //check for overlap with cars
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
+        
+        /*/check victory condition
+        if(this.player.yChange => levelNum*2500){
+            this.player.disableControls = true;
+            levelNum += 1;
+            game.state.start('victory');
+        }*/
 
         //player death
         if(!this.player.isOnCar && !this.player.jumped){
@@ -282,7 +292,7 @@ var playState = {
 
     createBackground: function(){
         this.backgrounds = this.add.group();
-        this.backgrounds.createMultiple(3, 'background');
+        this.backgrounds.createMultiple(3, 'background'+levelNum);
         for (var i=0; i<3; i++){
             this.createBackgroundOne(-625*i);
         }
@@ -409,8 +419,7 @@ var playState = {
         //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
     },
-
-
+    
     playerJump: function(){
 
         if(this.player.jumped){
