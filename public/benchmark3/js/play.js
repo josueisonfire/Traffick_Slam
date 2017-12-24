@@ -11,8 +11,9 @@ var playState = {
         this.load.spritesheet('car5', 'assets/cars/cars (40x70)/RED CAR.png', 40, 70);
         this.load.spritesheet('car6', 'assets/cars/cars (40x70)/TAXI.png', 40, 70);
         this.load.spritesheet('car7', 'assets/cars/cars (40x70)/UNICORN CAR.png', 40, 70);
-        this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
-        this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
+        this.load.spritesheet('sports', 'assets/cars/sportz car (40x74)/Sports Car.png', 20, 37);
+        this.load.spritesheet('truck', 'assets/cars/pickup (48x80)/pickup truck.png', 24, 40);
+        this.load.spritesheet('policecar', 'assets/cars/POLICE CAR.png', 40,70);
         this.load.spritesheet('wall', 'assets/invwall.png', 40, 70);
         //load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
@@ -25,9 +26,55 @@ var playState = {
         game.load.audio('bushorn', 'assets/bushorn.mp3');
     },
     // function o manage all the sounds.
-    playSound: function(soundtype, loop, timeout)
+    // soundtype:
+    // -1 = stop all sounds.
+    // 0 = hoverslide
+    // 1 = click
+    // 2 = music
+    // 3 = carhorn
+    // 4 = pickuphorn
+    // 5 = bus_horn
+    // 6 = smallcarhorn
+    playSound: function(soundtype)
     {
+      switch (soundstype)
+      {
+        case -1:
+          //stop all sounds.
+          slide.stop();
+          click.stop();
+          music.stop();
+          carhorn.stop();
+          pickuphorn.stop();
+          bushorn.stop();
+          smallcarhorn.stop();
 
+        case 0:
+          //play hoverslide sounds.
+          slide.play();
+          break;
+        case 1:
+          click.play();
+          break;
+        case 2:
+          music.play();
+          break;
+        case 3:
+          carhorn.play();
+          break;
+        case 4:
+          pickuphorn.play()
+          break;
+        case 5:
+          bushorn.play();
+          break;
+        case 6:
+          smallcarhorn.play();
+          break;
+        default:
+          //no sounds is played.
+
+      }
     },
 
     create: function(){
@@ -37,7 +84,7 @@ var playState = {
 
         //create background images to repeat
         this.createBackground();
-        
+
         //lane x values
         this.lanes = [60, 205, 333, 473, 604];
 
@@ -45,7 +92,7 @@ var playState = {
         this.initializeCars();
         //create player character
         this.createPlayer();
-        
+
         //starting car
         this.startCar = this.cars.getFirstDead();
         this.startCar.reset(this.player.x, this.player.y);
@@ -75,6 +122,23 @@ var playState = {
                 this.invmes2 = this.add.text(this.player.x, this.player.y, 'Godmode Deactivated');
             }
             }, this);
+        //add all sounds:
+        // -1 = stop all sounds.
+        // 0 = hoverslide
+        slide = game.add.audio('slide');
+        // 1 = click
+        click = game.add.audio('click');
+        // 2 = music
+        music = game.add.audio('music');
+        // 3 = carhorn
+        carhorn = game.add.audio("carnhorn");
+        // 4 = pickuphorn
+        pickuphorn = game.add.audio('pickuphorn');
+        // 5 = bus_horn
+        bushorn = game.add.audio('bushorn');
+        // 6 = smallcarhorn
+        smallcarhorn = game.add.audio('smallcarnhorn');
+
     },
 
     update: function(){
@@ -89,12 +153,10 @@ var playState = {
         /*/walls follow player
         this.wall1.y = this.player.y;
         this.wall2.y = this.player.y;
-        
+
         //player collide with walls
         this.physics.arcade.collide(this.player, this.wall1);
         this.physics.arcade.collide(this.player, this.wall2);*/
-        
-        
         //infinite loop of background images
         this.updateBackground();
 
@@ -125,13 +187,13 @@ var playState = {
         this.createCars();
         //if a car goes off screen + 200 then kill that car
         this.cars.forEach(this.destroyCar);
-        
+
         //car AI
         this.cars.forEachAlive(this.carAI, this);
 
         //check for overlap with cars
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
-        
+
         //player death
         if(!this.player.isOnCar && !this.player.jumped){
             this.playerDeath();
@@ -165,8 +227,8 @@ var playState = {
         //player physics
         this.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true;
-        
-        //change hitbox        
+
+        //change hitbox
         this.player.anchor.setTo(0.5, 1);
         this.player.body.height = 34;
         this.player.body.width = 20;
@@ -205,7 +267,7 @@ var playState = {
         this.backgroundCounter++;
         return background;
     },
-    
+
     createWalls: function(){/*
         this.wall1 = this.add.sprite(this.lanes[this.player.lane-1]+20, this.player.y, 'wall');
         this.wall2 = this.add.sprite(this.lanes[this.player.lane+1], this.player.y, 'wall');
@@ -217,7 +279,7 @@ var playState = {
         this.wall2.body.immovable = true;
         //TODO: maek invisible*/
     },
-    
+
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
@@ -245,16 +307,16 @@ var playState = {
         });
         this.carTimer = true;
     },
-    
+
     playerChangeLanes: function(){
         //function that handles the player changing lanes, using left and right keys UNUSED
-        
+
         this.cursors.left.onDown.add(function(){
             if(!this.player.disableControls){
                 if(this.player.lane > 1){
                     this.player.lane -= 1;
                     this.player.x -= 130;
-                }                
+                }
             }
         }, this);
         this.cursors.right.onDown.add(function(){
@@ -262,11 +324,11 @@ var playState = {
                 if(this.player.lane < 4){
                     this.player.lane += 1;
                     this.player.x += 130;
-                }                
+                }
             }
         }, this);
     },
-    
+
 //update-related functions
     updateBackground: function(){
         this.backgrounds.forEachAlive( function(bg){
@@ -299,7 +361,7 @@ var playState = {
                 if (this.player.body.velocity.y < this.player.accel && this.player.body.velocity.y > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.y = 0;
             }
-        
+
         // LEFT-RIGHT MOVEMENTS
             if(this.cursors.left.isDown){
                 this.player.body.velocity.x = -this.player.speedX;
@@ -314,12 +376,12 @@ var playState = {
                 if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.x = 0;
             }
-        
+
         }
         //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
     },
-    
+
 
     playerJump: function(){
 
@@ -356,10 +418,10 @@ var playState = {
     playerAnimate: function(){
         if(this.player.jumped){
             if(this.player.isFacingUp)
-                    this.player.animations.play('jumpUp');                
+                    this.player.animations.play('jumpUp');
             else
                     this.player.animations.play('jumpDown');
-            
+
         }else{
             if(this.cursors.up.isDown){
                 if(this.cursors.left.isDown){
@@ -439,34 +501,40 @@ var playState = {
 
     carOverlap: function(player, car){
         if(!player.jumped){
-        //if player is inside the zone 
+        //if player is inside the zone
             /*if(player.x+player.width/2 > car.x && player.x+player.width/2 < car.x + car.width && player.y+player.height/2 > car.y && player.y+player.height/2 < car.y + car.height)
                 player.isOnCar = true;
             else{
                 player.isOnCar = false;
             }*/
 
-            
+
                 if(this.cursors.up.isDown)
                     player.body.velocity.y = car.body.velocity.y-this.player.onCarspeed;
                 else if(this.cursors.down.isDown)
                     player.body.velocity.y = car.body.velocity.y+this.player.onCarspeed;
                 else
                     player.body.velocity.y = car.body.velocity.y;
-                
+
                 if(this.cursors.left.isDown)
                     player.body.velocity.x = car.body.velocity.x-this.player.onCarspeed;
                 else if(this.cursors.right.isDown)
                     player.body.velocity.x = car.body.velocity.x+this.player.onCarspeed;
                 else
                     player.body.velocity.x = car.body.velocity.x;
-                //debug
-            
-        game.debug.text("current car.lane:       "+car.lane, 32, 140);
+
         }
     },
-    
+
     carAI: function(car){
+        //TODO: implement
+        car.seeCar = playState.physics.arcade.overlap(car.frontBox, this.cars);
+
+        if(car.seeCar){
+            car.body.velocity.y += 20;
+        }
+
+        game.debug.text("current car sees?:  "+car.seeCar, 32, 232);
         //check if box intersects with any other cars
         this.cars.forEachAlive(this.checkOverlap, this, car);
     },
@@ -474,6 +542,7 @@ var playState = {
         if(car1.id != car2.id && car2.lane == car1.lane){
             if(car1.y < car2.y && car1.y > car2.y + car1.body.velocity.y/2 - 100){
                 car2.body.velocity.y *= 0.8;
+                playSound(3);
             }
         }
     },
