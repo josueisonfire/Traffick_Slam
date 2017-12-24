@@ -140,6 +140,14 @@ var playState = {
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.cheatKeyL = this.input.keyboard.addKey(Phaser.Keyboard.L);
         this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I);
+        
+        //UI
+        this.spdDisplay = menuState.addtext(this.camera.x+64, this.camera.y+32, "SPEED: "+Math.floor(-this.player.body.velocity.y), 20);
+        this.distDisplay = menuState.addtext(this.camera.x+64,this.camera.y+64, "DISTANCE: "+Math.floor(this.player.yChange), 20);
+        this.reachMsg = menuState.addtext(0,0, "REACH "+(levelNum**2*5000+levelNum*5000)+" DISTANCE!", 50);
+        this.msgFade = this.add.tween(this.reachMsg).to( {alpha:0}, 3500, Phaser.Easing.Linear.None, false);
+        this.msgFade.start();
+        
         //cheats
         this.cheatKeyI.onDown.add(function(){
             if (!this.player.invincible && !this.player.isDead){
@@ -228,12 +236,20 @@ var playState = {
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
         
         //check victory condition
-        if(this.player.yChange >= levelNum*5000 && !this.player.disableControls || this.cheatKeyL.isDown){
+        if(this.player.yChange >= (levelNum**2*5000+levelNum*5000) && !this.player.disableControls || this.cheatKeyL.isDown){
             this.player.disableControls = true;
             unlocked+=1;
             this.world.removeAll();
             game.state.start('victory');
         }
+        
+        //UI follow
+        this.reachMsg.x = this.camera.x + 400;
+        this.reachMsg.y = this.camera.y + 300;
+        this.spdDisplay.destroy();
+        this.spdDisplay = menuState.addtext(this.camera.x+74, this.camera.y+32, "SPEED: "+Math.floor(-this.player.body.velocity.y), 20);
+        this.distDisplay.destroy();
+        this.distDisplay = menuState.addtext(this.camera.x+=96,this.camera.y+64, "DISTANCE: "+Math.floor(this.player.yChange), 20);
 
         //player death
         if(!this.player.isOnCar && !this.player.jumped){
@@ -329,12 +345,12 @@ var playState = {
             tmpCar.type = 'normal';
             tmpCar.animations.add('vroom', game.math.numberArray(0,3), 5, true);
         }
-        var pcar = this.cars.create(0,0, 'policecar', null, false);
-        pcar.type = 'police';
-        pcar.animations.add('vroom', game.math.numberArray(0,8), 5, true);
-        var scar = this.cars.create(0,0, 'sports', null, false);
-        scar.type = 'sports';
-        scar.animations.add('vroom', game.math.numberArray(0,4), 5, true);
+        this.cars.pcar = this.cars.create(0,0, 'policecar', null, false);
+        this.cars.pcar.type = 'police';
+        this.cars.pcar.animations.add('vroom', game.math.numberArray(0,8), 5, true);
+        this.cars.scar = this.cars.create(0,0, 'sports', null, false);
+        this.cars.scar.type = 'sports';
+        this.cars.scar.animations.add('vroom', game.math.numberArray(0,4), 5, true);
         /*this.cars.create(0,0, 'car1', null, false);
         this.cars.create(0,0, 'car2', null, false);
         this.cars.create(0,0, 'car3', null, false);
@@ -530,7 +546,17 @@ var playState = {
 
     },
     createOneCar: function(lane){
-        var car = this.cars.getFirstDead();
+        if(Math.random()<0.80){
+            var car = this.cars.getFirstDead();
+        }
+        else{
+            if(Math.random()<0.5){
+                var car = this.cars.scar;
+            }else{
+                var car = this.cars.pcar;
+            }
+        }
+            
         if(car != null){
             car.reset(this.lanes[lane], this.camera.y + 680);
             car.lane = lane;
