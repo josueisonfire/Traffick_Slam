@@ -14,7 +14,7 @@ var playState = {
         this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
         this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
         this.load.spritesheet('wall', 'assets/invwall.png', 40, 70);
-        this.load.image('retry', 'retry,png');
+        this.load.image('retry', 'assets/retry.png');
         //load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
         game.load.audio('click', 'assets/click.mp3')
@@ -56,7 +56,9 @@ var playState = {
         //this.createWalls();
         //retry screen
         this.retryScreen = this.add.sprite(0,0, 'retry');
-        this.retryScreen.alpha = 0;
+        this.retryScreen.visible = false;
+        this.retryScreen.inputEnabled = true;
+        this.retryScreen.events.onInputDown.add(this.restart, this);
         //player animations
         this.createPlayerAnimations();
 
@@ -413,7 +415,7 @@ var playState = {
             this.player.body.velocity.setTo(0,0);
             this.player.animations.play('dying');
             this.time.events.add(1000, function(){
-                this.retryScreen.alpha = 1;
+                this.retryScreen.visible = true;
             }, this);
         }
     },
@@ -482,5 +484,11 @@ var playState = {
                 car2.body.velocity.y *= 0.8;
             }
         }
+    },
+    restart: function(){
+        this.world.removeAll();
+        this.world.setBounds(0, 0, this.world.width, this.game.height);
+        this.player.isDead = false;
+        this.create();
     }
 };
