@@ -39,7 +39,7 @@ var playState = {
         this.createBackground();
         
         //lane x values
-        this.lanes = [60, 190, 320, 450, 570];
+        this.lanes = [60, 205, 333, 473, 604];
 
         //create cars
         this.initializeCars();
@@ -136,7 +136,6 @@ var playState = {
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.lanes[1]/*TODO: change if needed*/, this.world.height -300, 'player');
-        //this.player.anchor.setTo(0.5,0.5);
         //boolean variables
         this.player.isDead = false;
         this.player.jumped = false;
@@ -160,6 +159,11 @@ var playState = {
         //player physics
         game.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true;
+        
+        //change hitbox        
+        this.player.anchor.setTo(0.5, 1);
+        this.player.body.height = 34;
+        this.player.body.width = 20;
     },
 
     createPlayerAnimations: function(){
@@ -224,6 +228,10 @@ var playState = {
         this.cars.create(0,0, 'car7', null, false);*/
         this.cars.forEach(function(car)
         {
+            car.anchor.setTo(0.5, 0.5)
+            car.scale.setTo(2, 2);
+            car.body.width *=1.8;
+            car.body.height *=1.8;
         })
         this.carTimer = true;
     },
