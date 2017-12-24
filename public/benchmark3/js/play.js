@@ -47,7 +47,7 @@ var playState = {
         this.createPlayer();
         
         //create 2 inv walls
-        this.createWalls();
+        //this.createWalls();
 
         //player animations
         this.createPlayerAnimations();
@@ -77,13 +77,14 @@ var playState = {
                 this.playerJump();
             }
         }
-        //walls follow player
+        //walls
+        /*/walls follow player
         this.wall1.y = this.player.y;
         this.wall2.y = this.player.y;
         
         //player collide with walls
         this.physics.arcade.collide(this.player, this.wall1);
-        this.physics.arcade.collide(this.player, this.wall2);
+        this.physics.arcade.collide(this.player, this.wall2);*/
 
         
         //infinite loop of background images
@@ -94,10 +95,10 @@ var playState = {
         game.debug.text("Y:                 " + this.player.y, 32, 64);
         game.debug.text("player.jumped:     "+this.player.jumped, 32, 120);
         game.debug.text("player.lane:       "+this.player.lane, 32, 140);
-        game.debug.text("gravityX:          "+this.player.body.gravity.x, 32, 160);
+        game.debug.text("player onlane:     "+this.player.onLane, 32, 160);
         game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
-        game.debug.text("invincible:        "+this.player.invincible, 32, 220);
+        game.debug.text("lane position:     "+this.lanes[this.player.lane], 32, 220);
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
 
@@ -124,7 +125,7 @@ var playState = {
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.lanes[1]/*TODO: change if needed*/, this.world.height -300, 'player');
-        this.player.scale.setTo(2,2);
+        //this.player.scale.setTo(2,2);
         //this.player.anchor.setTo(0.5,0.5);
         //boolean variables
         this.player.isDead = false;
@@ -151,7 +152,6 @@ var playState = {
         //player physics
         game.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true;
-        this.player.body.gravity.x = -300;
     },
 
     createPlayerAnimations: function(){
@@ -219,11 +219,9 @@ var playState = {
         
         this.cursors.left.onDown.add(function(){
             if(!this.player.disableControls){
+                    this.player.x -= 130;
                 if(this.player.lane > 1){
                     this.player.lane -= 1;
-                    this.player.body.gravity.x = -300;
-                    //this.wall1.x = this.lanes[this.player.lane-1]+20;
-                    this.wall2.x = this.lanes[this.player.lane+1];
                 }                
             }
         }, this);
@@ -231,9 +229,7 @@ var playState = {
             if(!this.player.disableControls){
                 if(this.player.lane < 4){
                     this.player.lane += 1;
-                    this.player.body.gravity.x = 300;
-                    //this.wall1.x = this.lanes[this.player.lane-1]+20;
-                    this.wall2.x = this.lanes[this.player.lane+1];
+                    this.player.x += 130;
                 }                
             }
         }, this);
@@ -274,20 +270,33 @@ var playState = {
         // LEFT-RIGHT MOVEMENTS
         
         /*
-        if(this.player.position.x < this.lanes[this.player.lane]){
-            this.player.position.x += 0.1;
-            if(this.player.position.x > this.lanes[this.player.lane]-40){
-                this.player.position.x = this.lanes[this.player.lane];
+        if(this.player.x < this.lanes[this.player.lane] || this.player.x > this.lanes[this.player.lane]){
+            this.player.onLane = false;
+            }
+        else{
+            this.player.onLane = true;
+        }
+        if(this.player.onLane){
+            if(this.cursors.right.isDown){
+                this.player.x+=1;
+            }
+            else if(this.cursors.left.isDown){
+                this.player.x-=1;
             }
         }
-        else if(this.player.position.x > this.lanes[this.player.lane]){
-            this.player.position.x -= 0.1;
-            if(this.player.position.x < this.lanes[this.player.lane]+40){
-                this.player.position.x = this.lanes[this.player.lane];
+        if(!this.player.onLane){
+            if(this.player.x < this.lanes[this.player.lane]){
+                this.player.x += 10;
+                this.player.onLane = false;
+            }
+            else if(this.player.x > this.lanes[this.player.lane]){
+                this.player.x -= 10;
+                this.player.onLane = false;
+            }
+            else{
+                this.player.onLane = true;
             }
         }*/
-            
-            
             
         //track the maximum distance player has traveled
     this.player.yChange = Math.max(this.player.yChange, -(this.player.y - this.player.yOrig));
@@ -355,9 +364,6 @@ var playState = {
                     this.player.animations.play('jumpDown');
                 }
             }
-        }
-        else if (this.crouchKey.isDown){
-            this.player.animations.play('crouch');
         }
         else{
             if(this.cursors.up.isDown){
