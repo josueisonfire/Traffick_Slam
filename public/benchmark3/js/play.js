@@ -136,7 +136,6 @@ var playState = {
 //create-related functions
     createPlayer: function(){
         this.player = game.add.sprite(this.lanes[1]/*TODO: change if needed*/, this.world.height -300, 'player');
-        this.player.scale.setTo(2,2);
         //this.player.anchor.setTo(0.5,0.5);
         //boolean variables
         this.player.isDead = false;
@@ -225,7 +224,6 @@ var playState = {
         this.cars.create(0,0, 'car7', null, false);*/
         this.cars.forEach(function(car)
         {
-            car.scale.setTo(2.8, 2.8);
         })
         this.carTimer = true;
     },
