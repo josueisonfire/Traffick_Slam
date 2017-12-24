@@ -225,12 +225,12 @@ var playState = {
         //check for overlap with cars
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
         
-        /*/check victory condition
-        if(this.player.yChange => levelNum*2500){
+        //check victory condition
+        if(this.player.yChange >= levelNum*500){
             this.player.disableControls = true;
             levelNum += 1;
             game.state.start('victory');
-        }*/
+        }
 
         //player death
         if(!this.player.isOnCar && !this.player.jumped){
