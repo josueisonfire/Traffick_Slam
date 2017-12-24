@@ -109,10 +109,10 @@ var playState = {
         if(!this.player.jumped){
             if (this.runKey.isDown){
 
-                this.player.maxSpeed = 750;
+                this.player.onCarspeed = 80;
             }
             else{
-                this.player.maxSpeed = 300;
+                this.player.onCarspeed = 20;
             }
         }
 
@@ -120,9 +120,17 @@ var playState = {
         this.createCars();
         //if a car goes off screen + 200 then kill that car
         this.cars.forEach(this.destroyCar);
+        
+        //car AI
+        this.cars.forEach(this.carAI);
 
         //check for overlap with cars
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
+        
+        //player death
+        if(!this.player.isOnCar && !this.player.jumped){
+            this.playerDeath();
+        }
     },
 
 //create-related functions
@@ -142,7 +150,7 @@ var playState = {
         //speed properties
         this.player.maxSpeed = 300;
         this.player.accel = 20;
-        this.player.friction = 0.9;
+        this.player.friction = 1;
         this.player.jumpScale = 0.02;
         this.player.onCarspeed = 20;
 
@@ -303,9 +311,9 @@ var playState = {
 
         if(this.player.jumped){
             //change spd values for air controls
-            this.player.accel = 8;
+            this.player.accel = 15;
             this.player.friction = 1;
-            this.player.maxSpeed = 1000;
+            this.player.maxSpeed = 10000;
         //change sprite size for going up
             if(this.player.goingUp){
                 this.player.scale.x += this.player.jumpScale;
@@ -319,7 +327,7 @@ var playState = {
         }else{
             //reset scale and speed values to original
             this.player.accel = 20;
-            this.player.friction = 0.9;
+            //this.player.friction = 0.9;
         }
 
         //when jump happens
@@ -398,7 +406,7 @@ var playState = {
             }
         }
     },
-    playerDead: function(){
+    playerDeath: function(){
         if (!this.player.invincible && !this.player.isDead){
         this.player.isDead = true;
         this.player.body.velocity.setTo(0,0);
@@ -411,7 +419,7 @@ var playState = {
         if (this.carTimer){
             game.time.events.add(500, function(){this.carTimer = true;}, this)
             this.carTimer = false;
-            this.createOneCar(Math.floor(Math.random() * 5));
+            this.createOneCar(Math.floor(Math.random() * 4)+1);
         }
 
     },
@@ -420,7 +428,7 @@ var playState = {
         if(car != null){
             if (lane != 0){
                 car.reset(this.lanes[lane], this.camera.y + 640);
-                car.body.velocity.y = this.player.body.velocity.y+(Math.random()-0.9)*100;
+                car.body.velocity.y = this.player.body.velocity.y-(Math.random())*100;
             }
             else{
                 car.reset(this.lanes[lane], this.camera.y - 140);
@@ -462,7 +470,8 @@ var playState = {
         }
     },
     
-    carAI: function(){
+    carAI: function(car){
         //TODO: implement
+        //attach invisible box in front of car, check if that collides with any cars or obstacles
     }
 };
