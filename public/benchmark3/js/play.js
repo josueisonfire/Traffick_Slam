@@ -192,6 +192,7 @@ var playState = {
         this.updateBackground();
 
         //debug stuff TODO:: erase
+        /*
         game.debug.text("X:                 " + this.player.x, 32, 32);
         game.debug.text("Y:                 " + this.player.y, 32, 64);
         game.debug.text("player.jumped:     "+this.player.jumped, 32, 120);
@@ -200,6 +201,7 @@ var playState = {
         game.debug.text("camera.y:          "+this.camera.y, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
         //game.debug.text("lane position:     "+this.lanes[this.player.lane], 32, 220);
+        */
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
         this.world.setBounds(0, -this.player.yChange, this.world.width, this.game.height);
 
