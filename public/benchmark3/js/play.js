@@ -428,12 +428,8 @@ var playState = {
         var car = this.cars.getFirstDead();
         if(car != null){
             if (lane != 0){
-                car.reset(this.lanes[lane], this.camera.y + 640);
+                car.reset(this.lanes[lane], this.camera.y + 680);
                 car.body.velocity.y = this.player.body.velocity.y-(Math.random())*100;
-            }
-            else{
-                car.reset(this.lanes[lane], this.camera.y - 140);
-                car.body.velocity.y = 500;
             }
         }
 
