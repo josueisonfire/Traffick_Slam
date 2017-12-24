@@ -2,15 +2,15 @@ var playState = {
     preload: function(){
         //load all assets
         this.load.image('background', 'assets/background1.png');
-        this.load.spritesheet('player', 'assets/player.png', 57, 75);
-        this.load.spritesheet('bus', 'assets/cars/bus (30x50)/bus.png', 30, 50);
-        this.load.spritesheet('car1', 'assets/cars/cars (20x35)/BLACK CAR.png', 20, 35);
-        this.load.spritesheet('car2', 'assets/cars/cars (20x35)/BLUE CAR.png', 20, 35);
-        this.load.spritesheet('car3', 'assets/cars/cars (20x35)/COFFEE CAR.png', 20, 35);
-        this.load.spritesheet('car4', 'assets/cars/cars (20x35)/GREEN CAR.png', 20, 35);
-        this.load.spritesheet('car5', 'assets/cars/cars (20x35)/RED CAR.png', 20, 35);
-        this.load.spritesheet('car6', 'assets/cars/cars (20x35)/TAXI.png', 20, 35);
-        this.load.spritesheet('car7', 'assets/cars/cars (20x35)/UNICORN CAR.png', 20, 35);
+        this.load.spritesheet('player', 'assets/player.png', 38, 50);
+        this.load.spritesheet('bus', 'assets/cars/bus (60x100)/bus.png', 30, 50);
+        this.load.spritesheet('car1', 'assets/cars/cars (40x70)/BLACK CAR.png', 40, 70);
+        this.load.spritesheet('car2', 'assets/cars/cars (40x70)/BLUE CAR.png', 40, 70);
+        this.load.spritesheet('car3', 'assets/cars/cars (40x70)/COFFEE CAR.png', 40, 70);
+        this.load.spritesheet('car4', 'assets/cars/cars (40x70)/GREEN CAR.png', 40, 70);
+        this.load.spritesheet('car5', 'assets/cars/cars (40x70)/RED CAR.png', 40, 70);
+        this.load.spritesheet('car6', 'assets/cars/cars (40x70)/TAXI.png', 40, 70);
+        this.load.spritesheet('car7', 'assets/cars/cars (40x70)/UNICORN CAR.png', 40, 70);
         this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
         this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
         this.load.image('wall', 'assets/invwall.png');
@@ -269,9 +269,7 @@ var playState = {
         else
             this.player.disableControls = false;
             */
-        if(this.player.onCar){
-        }
-        else{
+        if(!this.player.onCar){
             if(this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
                 this.player.body.velocity.y -= this.player.accel;
             }
