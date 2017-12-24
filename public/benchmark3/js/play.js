@@ -37,7 +37,7 @@ var playState = {
     // 6 = smallcarhorn
     playSound: function(soundtype)
     {
-      switch (soundstype)
+      switch (soundtype)
       {
         case -1:
           //stop all sounds.
@@ -51,12 +51,15 @@ var playState = {
 
         case 0:
           //play hoverslide sounds.
+          slide.stop();
           slide.play();
           break;
         case 1:
+          click.stop();
           click.play();
           break;
         case 2:
+          music.stop();
           music.play();
           break;
         case 3:
@@ -542,7 +545,7 @@ var playState = {
         if(car1.id != car2.id && car2.lane == car1.lane){
             if(car1.y < car2.y && car1.y > car2.y + car1.body.velocity.y/2 - 100){
                 car2.body.velocity.y *= 0.8;
-                playSound(3);
+                this.playSound(3);
             }
         }
     },
