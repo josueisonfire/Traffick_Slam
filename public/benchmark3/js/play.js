@@ -213,13 +213,17 @@ var playState = {
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
-        this.cars.create(0,0, 'car1', null, false);
+        for(var i= 1; i<8; i++){
+            this.tmpCar = this.cars.create(0,0, 'car'+i, null, false);
+            this.tmpCar.type = 'normal';
+        }
+        /*this.cars.create(0,0, 'car1', null, false);
         this.cars.create(0,0, 'car2', null, false);
         this.cars.create(0,0, 'car3', null, false);
         this.cars.create(0,0, 'car4', null, false);
         this.cars.create(0,0, 'car5', null, false);
         this.cars.create(0,0, 'car6', null, false);
-        this.cars.create(0,0, 'car7', null, false);
+        this.cars.create(0,0, 'car7', null, false);*/
         this.cars.forEach(function(car)
         {
             car.scale.setTo(2.8, 2.8);
