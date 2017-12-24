@@ -14,7 +14,6 @@ var playState = {
         this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
         this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
         this.load.spritesheet('wall', 'assets/invwall.png', 40, 70);
-        this.load.image('retry', 'assets/retry.png');
         //load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
         game.load.audio('click', 'assets/click.mp3')
@@ -54,11 +53,6 @@ var playState = {
         this.startCar.body.velocity.y = -200;
         //create 2 inv walls
         //this.createWalls();
-        //retry screen
-        this.retryScreen = this.add.sprite(0,0, 'retry');
-        this.retryScreen.visible = false;
-        this.retryScreen.inputEnabled = true;
-        this.retryScreen.events.onInputDown.add(this.restart, this);
         //player animations
         this.createPlayerAnimations();
 
@@ -100,9 +94,6 @@ var playState = {
         this.physics.arcade.collide(this.player, this.wall1);
         this.physics.arcade.collide(this.player, this.wall2);*/
         
-        //screens follow camera
-        this.retryScreen.x = this.camera.x;
-        this.retryScreen.y = this.camera.y;
         
         //infinite loop of background images
         this.updateBackground();
@@ -112,8 +103,8 @@ var playState = {
         game.debug.text("Y:                 " + this.player.y, 32, 64);
         game.debug.text("player.jumped:     "+this.player.jumped, 32, 120);
         //game.debug.text("player.lane:       "+this.player.lane, 32, 140);
-        game.debug.text("player oncar:      "+this.player.isOnCar, 32, 160);
-        game.debug.text("player velocityX:  "+this.player.body.velocity.x, 32, 180);
+        game.debug.text("camera.x:          "+this.camera.x, 32, 160);
+        game.debug.text("camera.y:          "+this.camera.y, 32, 180);
         game.debug.text("player velocityY:  "+this.player.body.velocity.y, 32, 200);
         //game.debug.text("lane position:     "+this.lanes[this.player.lane], 32, 220);
         //The bounds of the world is adjusted to match the furthest the player has reached. i.e. the world moves with the player albeit only upwards
@@ -149,7 +140,7 @@ var playState = {
 
 //create-related functions
     createPlayer: function(){
-        this.player = game.add.sprite(this.lanes[1]/*TODO: change if needed*/, this.world.height -300, 'player');
+        this.player = this.add.sprite(this.lanes[1]/*TODO: change if needed*/, this.world.height -300, 'player');
         //boolean variables
         this.player.isDead = false;
         this.player.jumped = false;
@@ -415,7 +406,8 @@ var playState = {
             this.player.body.velocity.setTo(0,0);
             this.player.animations.play('dying');
             this.time.events.add(1000, function(){
-                this.retryScreen.visible = true;
+                this.world.removeAll();
+                game.state.start('retry');
             }, this);
         }
     },
@@ -486,9 +478,5 @@ var playState = {
         }
     },
     restart: function(){
-        this.world.removeAll();
-        this.world.setBounds(0, 0, this.world.width, this.game.height);
-        this.player.isDead = false;
-        this.create();
     }
 };

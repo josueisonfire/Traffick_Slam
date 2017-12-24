@@ -5,6 +5,9 @@ game.state.add('help', helpState);
 game.state.add('controls', controlsState);
 game.state.add('menu', menuState);
 game.state.add('play', playState);
+game.state.add('retry', retryState);
+
+var levelNum = 1;
 
 //change to boot in final version maybe?
 game.state.start('menu');
