@@ -1,3 +1,11 @@
+//toggle variables.
+var toggle0 = true;
+var toggle1 = true;
+var toggle2 = true;
+var toggle3 = true;
+var toggle4 = true;
+var toggle5 = true;
+var toggle6 = true;
 var playState = {
     preload: function(){
         //load all assets
@@ -48,32 +56,49 @@ var playState = {
           pickuphorn.stop();
           bushorn.stop();
           smallcarhorn.stop();
-
-        case 0:
-          //play hoverslide sounds.
-          slide.stop();
-          slide.play();
           break;
-        case 1:
-          click.stop();
-          click.play();
-          break;
-        case 2:
-          music.stop();
-          music.play();
-          break;
+        // case 0:
+        //   if(toggle0)
+        //   {
+        //     toggle0 = false;
+        //     slide.play();
+        //     setInterval(function(){toggle0 = true;}, 300);
+        //   }
+        //   break;
+        // case 1:
+        //   if(toggle1)
+        //   {
+        //     click.play();
+        //     toggle1 = false;
+        //     setInterval(function(){toggle1 = true;}, 300);
+        //   }
+        //   break;
+        // case 2:
+        //   music.stop();
+        //   if(toggle2)
+        //   {
+        //     music.play();
+        //     toggle2 = false;
+        //     setInterval(function(){toggle2 = true;}, 15000);
+        //   }
+        //   break;
         case 3:
+        if(toggle3)
+        {
+          toggle3 = false;
           carhorn.play();
-          break;
-        case 4:
-          pickuphorn.play()
-          break;
-        case 5:
-          bushorn.play();
-          break;
-        case 6:
-          smallcarhorn.play();
-          break;
+          setTimeout(function(){toggle3 = true;}, (3000*Math.random()) + 4000);
+        }
+        break;
+      //   case 4:
+      //     //pickuphorn.play()
+      //     break;
+      //   case 5:
+      //     //bushorn.play();
+      //     break;
+      //   case 6:
+      //     //smallcarhorn.play();
+      //     break;
         default:
           //no sounds is played.
 
