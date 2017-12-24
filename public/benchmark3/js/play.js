@@ -13,7 +13,7 @@ var playState = {
         this.load.spritesheet('car7', 'assets/cars/cars (40x70)/UNICORN CAR.png', 40, 70);
         this.load.spritesheet('truck', 'assets/cars/pickup (24x40)/pickup truck.png', 24, 40);
         this.load.spritesheet('sports', 'assets/cars/sportz car (20x37)/Sports Car.png', 20, 37);
-        this.load.image('wall', 'assets/invwall.png');
+        this.load.spritesheet('wall', 'assets/invwall.png', 40, 70);
         //load all sounds
         game.load.audio('slide', 'assets/slide.mp3');
         game.load.audio('click', 'assets/click.mp3')
@@ -146,9 +146,10 @@ var playState = {
         this.player.disableControls = false;
         this.player.invincible = false;
         //speed properties
-        this.player.maxSpeed = 300;
+        this.player.speedX = 200;
         this.player.accel = 20;
-        this.player.friction = 1;
+        this.player.frictionX = 0.9;
+        this.player.frictionY = 1;
         this.player.jumpDuration = 1000;
         this.player.onCarspeed = 20;
 
@@ -157,7 +158,7 @@ var playState = {
         this.player.yChange = 0;
 
         //player physics
-        game.physics.arcade.enable(this.player);
+        this.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true;
         
         //change hitbox        
@@ -232,12 +233,16 @@ var playState = {
             car.scale.setTo(2, 2);
             car.body.width *=1.8;
             car.body.height *=1.8;
+            //invisible box
+            car.frontBox = game.add.sprite(car.x-car.body.width/4, car.y-120, 'wall');
+            car.addChild(car.frontBox);
+            car.children.enableBody = true;
         })
         this.carTimer = true;
     },
     
     playerChangeLanes: function(){
-        //function that handles the player changing lanes, using left and right keys
+        //function that handles the player changing lanes, using left and right keys UNUSED
         
         this.cursors.left.onDown.add(function(){
             if(!this.player.disableControls){
@@ -276,30 +281,30 @@ var playState = {
             this.player.disableControls = false;
             */
         if(!this.player.onCar){
-            if(this.cursors.up.isDown && this.player.body.velocity.y > -this.player.maxSpeed){
-                this.player.body.velocity.y -= this.player.accel;
+            if(this.cursors.up.isDown){
+                this.player.body.velocity.y -= 1;
             }
-            else if (this.cursors.down.isDown && this.player.body.velocity.y < this.player.maxSpeed){
+            else if (this.cursors.down.isDown){
                 this.player.body.velocity.y += this.player.accel;
             }
             else{
                 //slowing down; friction-like effect
-                this.player.body.velocity.y *= this.player.friction;
+                this.player.body.velocity.y *= this.player.frictionY;
                 //stop entirely when velocity is too small (while on ground)
                 if (this.player.body.velocity.y < this.player.accel && this.player.body.velocity.y > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.y = 0;
             }
         
         // LEFT-RIGHT MOVEMENTS
-            if(this.cursors.left.isDown && this.player.body.velocity.x > -this.player.maxSpeed){
-                this.player.body.velocity.x -= this.player.accel;
+            if(this.cursors.left.isDown){
+                this.player.body.velocity.x = -this.player.speedX;
             }
-            else if (this.cursors.right.isDown && this.player.body.velocity.x < this.player.maxSpeed){
-                this.player.body.velocity.x += this.player.accel;
+            else if (this.cursors.right.isDown){
+                this.player.body.velocity.x = this.player.speedX;
             }
             else{
                 //slowing down; friction-like effect
-                this.player.body.velocity.x *= this.player.friction;
+                this.player.body.velocity.x *= this.player.frictionX;
                 //stop entirely when velocity is too small (while on ground)
                 if (this.player.body.velocity.x < this.player.accel && this.player.body.velocity.x > -this.player.accel && !this.player.jumped)
                     this.player.body.velocity.x = 0;
@@ -318,9 +323,8 @@ var playState = {
 
         if(this.player.jumped){
             //change spd values for air controls
-            this.player.accel = 15;
-            this.player.friction = 1;
-            this.player.maxSpeed = 10000;
+            this.player.accel = 10;
+            this.player.frictionY = 1;
             /*
         //change sprite size for going up
             if(this.player.goingUp){
@@ -468,7 +472,13 @@ var playState = {
     },
     
     carAI: function(car){
-        //TODO: implement
-        //attach invisible box in front of car, check if that collides with any cars or obstacles
+        //TODO: implement    
+        car.seeCar = playState.physics.arcade.overlap(car.frontBox, this.cars);
+        
+        if(car.seeCar){
+            car.body.velocity.y += 20;
+        }
+        
+        game.debug.text("current car sees?:  "+car.seeCar, 32, 232);
     }
 };
