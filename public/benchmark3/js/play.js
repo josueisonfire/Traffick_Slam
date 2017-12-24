@@ -2,7 +2,7 @@ var playState = {
     preload: function(){
         //load all assets
         this.load.image('background', 'assets/background1.png');
-        this.load.spritesheet('player', 'assets/player_new.png', 57, 75);
+        this.load.spritesheet('player', 'assets/player.png', 57, 75);
         this.load.spritesheet('bus', 'assets/cars/bus (30x50)/bus.png', 30, 50);
         this.load.spritesheet('car1', 'assets/cars/cars (20x35)/BLACK CAR.png', 20, 35);
         this.load.spritesheet('car2', 'assets/cars/cars (20x35)/BLUE CAR.png', 20, 35);
@@ -151,7 +151,7 @@ var playState = {
         this.player.maxSpeed = 300;
         this.player.accel = 20;
         this.player.friction = 1;
-        this.player.jumpScale = 0.02;
+        this.player.jumpDuration = 1000;
         this.player.onCarspeed = 20;
 
         //variables to track where the player started and track change in y distance
@@ -165,21 +165,20 @@ var playState = {
 
     createPlayerAnimations: function(){
         this.player.animations.add('runningLeftDown', game.math.numberArray(0,3), 5, true);
-        this.player.animations.add('jumpLeftDown', game.math.numberArray(0,3), 1, true);
-        this.player.animations.add('runningRightDown', game.math.numberArray(4,7), 5, true);
-        this.player.animations.add('runningUp', game.math.numberArray(8,11), 5, true);
-        this.player.animations.add('runningDown', game.math.numberArray(12,15), 5, true);
-        this.player.animations.add('dying', game.math.numberArray(16,22), 5, false);
-        this.player.animations.add('runningLeftUp', game.math.numberArray(23,26), 5, true);
-        this.player.animations.add('runningRightUp', game.math.numberArray(27,30), 5, true);
-        this.player.animations.add('idleDown', game.math.numberArray(16,17), 5, true);
-        this.player.animations.add('idleUp', game.math.numberArray(31,32), 5, true);
-        this.player.animations.add('jumpLeftUp', [23], 1, true);
-        this.player.animations.add('jumpUp', [9], 1, true);
-        this.player.animations.add('jumpRightUp', [27], 1, true);
-        this.player.animations.add('jumpDown', [13], 1, true);
-        this.player.animations.add('jumpRightDown', [4], 1, true);
-        this.player.animations.add('crouch', [19], 1, true);
+        this.player.animations.add('jumpLeftDown', game.math.numberArray(4,9), 6*1000/this.player.jumpDuration, false);
+        this.player.animations.add('runningRightDown', game.math.numberArray(10,13), 5, true);
+        this.player.animations.add('jumpRightDown', game.math.numberArray(14,19), 6*1000/this.player.jumpDuration, false);
+        this.player.animations.add('runningUp', game.math.numberArray(20,23), 5, true);
+        this.player.animations.add('jumpUp', game.math.numberArray(24,29), 6*1000/this.player.jumpDuration, false);
+        this.player.animations.add('runningDown', game.math.numberArray(30,33), 5, true);
+        this.player.animations.add('jumpDown', game.math.numberArray(34,39), 6*1000/this.player.jumpDuration, false);
+        this.player.animations.add('dying', game.math.numberArray(40,46), 5, false);
+        this.player.animations.add('runningLeftUp', game.math.numberArray(47,50), 5, true);
+        this.player.animations.add('jumpLeftUp', game.math.numberArray(51, 57), 6*1000/this.player.jumpDuration, true);
+        this.player.animations.add('runningRightUp', game.math.numberArray(58,62), 5, true);
+        this.player.animations.add('jumpRightUp', game.math.numberArray(63, 68), 6*1000/this.player.jumpDuration, true);
+        this.player.animations.add('idleDown', game.math.numberArray(31,32), 5, true);
+        this.player.animations.add('idleUp', game.math.numberArray(69,70), 5, true);
     },
 
     createBackground: function(){
@@ -338,16 +337,9 @@ var playState = {
         //when jump happens
         if (this.jumpKey.isDown && !this.player.jumped){
             this.player.jumped = true;
-            this.player.goingUp = true;
-            //going up
-            this.time.events.add(500, function(){
-                this.player.goingUp = false;
-                this.player.goingDown = true;
-                //going down
-                this.time.events.add(500, function(){
-                    this.player.goingDown = false;
+            this.time.events.add(this.player.jumpDuration, function(){
                     this.player.jumped = false;
-                }, this);}, this);
+                }, this);
         }
     },
 
