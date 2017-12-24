@@ -2,7 +2,7 @@ var playState = {
     preload: function(){
         //load all assets
         this.load.image('background', 'assets/background1.png');
-        this.load.spritesheet('player', 'assets/player.png', 17, 17);
+        this.load.spritesheet('player', 'assets/player_new.png', 57, 75);
         this.load.spritesheet('bus', 'assets/cars/bus (30x50)/bus.png', 30, 50);
         this.load.spritesheet('car1', 'assets/cars/cars (20x35)/BLACK CAR.png', 20, 35);
         this.load.spritesheet('car2', 'assets/cars/cars (20x35)/BLUE CAR.png', 20, 35);
@@ -165,6 +165,7 @@ var playState = {
 
     createPlayerAnimations: function(){
         this.player.animations.add('runningLeftDown', game.math.numberArray(0,3), 5, true);
+        this.player.animations.add('jumpLeftDown', game.math.numberArray(0,3), 1, true);
         this.player.animations.add('runningRightDown', game.math.numberArray(4,7), 5, true);
         this.player.animations.add('runningUp', game.math.numberArray(8,11), 5, true);
         this.player.animations.add('runningDown', game.math.numberArray(12,15), 5, true);
@@ -176,7 +177,6 @@ var playState = {
         this.player.animations.add('jumpLeftUp', [23], 1, true);
         this.player.animations.add('jumpUp', [9], 1, true);
         this.player.animations.add('jumpRightUp', [27], 1, true);
-        this.player.animations.add('jumpLeftDown', [0], 1, true);
         this.player.animations.add('jumpDown', [13], 1, true);
         this.player.animations.add('jumpRightDown', [4], 1, true);
         this.player.animations.add('crouch', [19], 1, true);
@@ -318,6 +318,7 @@ var playState = {
             this.player.accel = 15;
             this.player.friction = 1;
             this.player.maxSpeed = 10000;
+            /*
         //change sprite size for going up
             if(this.player.goingUp){
                 this.player.scale.x += this.player.jumpScale;
@@ -327,7 +328,7 @@ var playState = {
             if (this.player.goingDown){
                 this.player.scale.x -= this.player.jumpScale;
                 this.player.scale.y -= this.player.jumpScale;
-            }
+            }*/
         }else{
             //reset scale and speed values to original
             this.player.accel = 20;
@@ -339,11 +340,11 @@ var playState = {
             this.player.jumped = true;
             this.player.goingUp = true;
             //going up
-            this.time.events.add(550, function(){
+            this.time.events.add(500, function(){
                 this.player.goingUp = false;
                 this.player.goingDown = true;
                 //going down
-                this.time.events.add(550, function(){
+                this.time.events.add(500, function(){
                     this.player.goingDown = false;
                     this.player.jumped = false;
                 }, this);}, this);
