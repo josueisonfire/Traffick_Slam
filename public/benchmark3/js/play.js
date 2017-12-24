@@ -14,7 +14,7 @@ var playState = {
         this.load.image('background3', 'assets/background3.png');
         this.load.image('background4', 'assets/background4.png');
         this.load.spritesheet('player', 'assets/player.png', 38, 50);
-        this.load.spritesheet('bus', 'assets/cars/bus (60x100)/bus.png', 30, 50);
+        this.load.spritesheet('car8', 'assets/cars/bus (60x100)/bus.png', 60, 100);
         this.load.spritesheet('car1', 'assets/cars/cars (40x70)/BLACK CAR.png', 40, 70);
         this.load.spritesheet('car2', 'assets/cars/cars (40x70)/BLUE CAR.png', 40, 70);
         this.load.spritesheet('car3', 'assets/cars/cars (40x70)/COFFEE CAR.png', 40, 70);
@@ -22,8 +22,8 @@ var playState = {
         this.load.spritesheet('car5', 'assets/cars/cars (40x70)/RED CAR.png', 40, 70);
         this.load.spritesheet('car6', 'assets/cars/cars (40x70)/TAXI.png', 40, 70);
         this.load.spritesheet('car7', 'assets/cars/cars (40x70)/UNICORN CAR.png', 40, 70);
-        this.load.spritesheet('sports', 'assets/cars/sportz car (40x74)/Sports Car.png', 20, 37);
-        this.load.spritesheet('truck', 'assets/cars/pickup (48x80)/pickup truck.png', 24, 40);
+        this.load.spritesheet('sports', 'assets/cars/sportz car (40x74)/Sports Car.png', 40, 74);
+        this.load.spritesheet('car9', 'assets/cars/pickup (48x80)/pickup truck.png', 48, 80);
         this.load.spritesheet('policecar', 'assets/cars/cars (40x70)/POLICE CAR.png', 40,70);
         this.load.spritesheet('wall', 'assets/invwall.png', 40, 70);
         //load all sounds
@@ -138,7 +138,7 @@ var playState = {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.runKey = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
         this.jumpKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.crouchKey = this.input.keyboard.addKey(Phaser.Keyboard.E);
+        this.cheatKeyL = this.input.keyboard.addKey(Phaser.Keyboard.L);
         this.cheatKeyI = this.input.keyboard.addKey(Phaser.Keyboard.I);
         //cheats
         this.cheatKeyI.onDown.add(function(){
@@ -226,9 +226,10 @@ var playState = {
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
         
         //check victory condition
-        if(this.player.yChange >= levelNum*5000){
+        if(this.player.yChange >= levelNum*5000 && !this.player.disableControls || this.cheatKeyL.isDown){
             this.player.disableControls = true;
-            levelNum += 1;
+            unlocked+=1;
+            this.world.removeAll();
             game.state.start('victory');
         }
 
@@ -321,14 +322,17 @@ var playState = {
     initializeCars: function(){
         this.cars = this.add.group();
         this.cars.enableBody = true;
-        for(var i= 1; i<8; i++){
+        for(var i= 1; i<10; i++){
             var tmpCar = this.cars.create(0,0, 'car'+i, null, false);
             tmpCar.type = 'normal';
             tmpCar.animations.add('vroom', game.math.numberArray(0,3), 5, true);
         }
         var pcar = this.cars.create(0,0, 'policecar', null, false);
-        pcar.type = 'police'
+        pcar.type = 'police';
         pcar.animations.add('vroom', game.math.numberArray(0,8), 5, true);
+        var scar = this.cars.create(0,0, 'sports', null, false);
+        scar.type = 'sports';
+        scar.animations.add('vroom', game.math.numberArray(0,4), 5, true);
         /*this.cars.create(0,0, 'car1', null, false);
         this.cars.create(0,0, 'car2', null, false);
         this.cars.create(0,0, 'car3', null, false);
@@ -526,11 +530,12 @@ var playState = {
     createOneCar: function(lane){
         var car = this.cars.getFirstDead();
         if(car != null){
-            if (lane != 0){
-                car.reset(this.lanes[lane], this.camera.y + 680);
-                car.lane = lane;
+            car.reset(this.lanes[lane], this.camera.y + 680);
+            car.lane = lane;
+            if(car.type == 'sports')
+                car.body.velocity.y = this.player.body.velocity.y-(Math.floor(Math.random()*10+5))*20;
+            else
                 car.body.velocity.y = this.player.body.velocity.y-(Math.floor(Math.random()*10+5))*10;
-            }
         }
 
     },
@@ -548,7 +553,7 @@ var playState = {
             else{
                 player.isOnCar = false;
             }*/
-            if(car.type == 'normal'){
+            if(car.type == 'normal' || car.type == 'sports'){
 
 
                 if(this.cursors.up.isDown)

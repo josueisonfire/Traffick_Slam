@@ -10,6 +10,6 @@ game.state.add('victory', victoryState);
 game.state.add('levels', levelsState);
 
 var levelNum = 1;
-
+var unlocked = 1;
 //change to boot in final version maybe?
 game.state.start('menu');
