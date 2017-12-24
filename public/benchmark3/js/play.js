@@ -219,9 +219,9 @@ var playState = {
         
         this.cursors.left.onDown.add(function(){
             if(!this.player.disableControls){
-                    this.player.x -= 130;
                 if(this.player.lane > 1){
                     this.player.lane -= 1;
+                    this.player.x -= 130;
                 }                
             }
         }, this);
