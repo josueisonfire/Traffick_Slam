@@ -49,6 +49,7 @@ var playState = {
         //starting car
         this.startCar = this.cars.getFirstDead();
         this.startCar.reset(this.player.x, this.player.y);
+        this.startCar.lane = 1;
         this.startCar.body.velocity.y = -200;
         //create 2 inv walls
         //this.createWalls();
@@ -122,7 +123,7 @@ var playState = {
         this.cars.forEach(this.destroyCar);
         
         //car AI
-        this.cars.forEach(this.carAI);
+        this.cars.forEachAlive(this.carAI, this);
 
         //check for overlap with cars
         this.player.isOnCar = this.physics.arcade.overlap(this.player, this.cars, this.carOverlap, null, this);
@@ -217,8 +218,8 @@ var playState = {
         this.cars = this.add.group();
         this.cars.enableBody = true;
         for(var i= 1; i<8; i++){
-            this.tmpCar = this.cars.create(0,0, 'car'+i, null, false);
-            this.tmpCar.type = 'normal';
+            var tmpCar = this.cars.create(0,0, 'car'+i, null, false);
+            tmpCar.type = 'normal';
         }
         /*this.cars.create(0,0, 'car1', null, false);
         this.cars.create(0,0, 'car2', null, false);
@@ -227,17 +228,17 @@ var playState = {
         this.cars.create(0,0, 'car5', null, false);
         this.cars.create(0,0, 'car6', null, false);
         this.cars.create(0,0, 'car7', null, false);*/
+        var idCount = 0;
         this.cars.forEach(function(car)
         {
             car.anchor.setTo(0.5, 0.5)
             car.scale.setTo(2, 2);
             car.body.width *=1.8;
             car.body.height *=1.8;
-            //invisible box
-            car.frontBox = game.add.sprite(car.x-car.body.width/4, car.y-120, 'wall');
-            car.addChild(car.frontBox);
-            playState.physics.arcade.enable(car.frontBox);
-        })
+            car.lane = 0;
+            car.id = idCount;
+            idCount++;
+        });
         this.carTimer = true;
     },
     
@@ -433,6 +434,7 @@ var playState = {
         if(car != null){
             if (lane != 0){
                 car.reset(this.lanes[lane], this.camera.y + 680);
+                car.lane = lane;
                 car.body.velocity.y = this.player.body.velocity.y-(Math.random())*100;
             }
         }
@@ -467,18 +469,21 @@ var playState = {
                     player.body.velocity.x = car.body.velocity.x+this.player.onCarspeed;
                 else
                     player.body.velocity.x = car.body.velocity.x;
-                
+                //debug
+            
+        game.debug.text("current car.lane:       "+car.lane, 32, 140);
         }
     },
     
     carAI: function(car){
-        //TODO: implement    
-        car.seeCar = playState.physics.arcade.overlap(car.frontBox, this.cars);
-        
-        if(car.seeCar){
-            car.body.velocity.y += 20;
+        //check if box intersects with any other cars
+        this.cars.forEachAlive(this.checkOverlap, this, car);
+    },
+    checkOverlap: function(car1, car2){
+        if(car1.id != car2.id && car2.lane == car1.lane){
+            if(car1.y < car2.y && car1.y > car2.y -220){
+                car2.body.velocity.y += 20;
+            }
         }
-        
-        game.debug.text("current car sees?:  "+car.frontBox.body.velocity.y, 32, 232);
     }
 };
